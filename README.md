@@ -3,54 +3,65 @@
 [![Lint and Test](https://github.com/theorigamicorporation/k8s-observability-stack/actions/workflows/lint-test.yaml/badge.svg)](https://github.com/theorigamicorporation/k8s-observability-stack/actions/workflows/lint-test.yaml)
 [![Release](https://github.com/theorigamicorporation/k8s-observability-stack/actions/workflows/release.yaml/badge.svg)](https://github.com/theorigamicorporation/k8s-observability-stack/actions/workflows/release.yaml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/k8s-observability-stack)](https://artifacthub.io/packages/search?repo=k8s-observability-stack)
 
 A complete, production-ready Kubernetes observability stack with VictoriaMetrics, Loki, Grafana Operator, and more. This chart serves as a modern replacement for `kube-prometheus-stack` and `kube-victoriametrics-stack` with enhanced support for larger clusters, service mesh integration, and distributed tracing.
 
-## Table of Contents
+---
 
-- [Overview](#overview)
-- [Architecture](#architecture) | [Detailed Diagrams](docs/architecture.md)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Components](#components)
-- [Upgrading](#upgrading)
-- [Local Development](#local-development) | [Makefile Targets](#makefile-targets)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [Roadmap](#roadmap)
-- [License](#license)
+## 📑 Table of Contents
 
-## Overview
+- [Overview](#-overview)
+- [Architecture](#-architecture) | [Detailed Diagrams](docs/architecture.md)
+- [Features](#-features)
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start)
+- [Installation](#-installation)
+- [Configuration](#%EF%B8%8F-configuration)
+- [Components](#-components)
+- [GitOps Deployment](#-gitops-deployment)
+- [Upgrading](#-upgrading)
+- [Local Development](#-local-development)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [Acknowledgments](#-acknowledgments)
+- [Roadmap](#-roadmap)
+- [License](#-license)
+
+---
+
+## 🔭 Overview
 
 The k8s-observability-stack is an umbrella Helm chart that deploys a complete observability solution for Kubernetes clusters. It integrates best-in-class open-source tools for metrics, logs, and traces collection, storage, and visualization.
 
 ### Why This Chart?
 
-- **Unified Installation**: Deploy your entire observability stack with a single Helm chart
-- **Production-Ready**: Pre-configured with best practices for alerting, dashboards, and retention
-- **Scalable**: Support for both single-node and cluster modes for metrics and tracing backends
-- **GitOps-Friendly**: Uses Grafana Operator for CRD-based management of datasources and dashboards
-- **Auto-Configuration**: Automatic datasource and service connection setup based on enabled components
+| Benefit | Description |
+|---------|-------------|
+| 📦 **Unified Installation** | Deploy your entire observability stack with a single Helm chart |
+| 🏭 **Production-Ready** | Pre-configured with best practices for alerting, dashboards, and retention |
+| 📈 **Scalable** | Support for both single-node and cluster modes for metrics and tracing backends |
+| 🔄 **GitOps-Friendly** | Uses Grafana Operator for CRD-based management of datasources and dashboards |
+| ⚡ **Auto-Configuration** | Automatic datasource and service connection setup based on enabled components |
 
-## Architecture
+---
+
+## 🏗️ Architecture
 
 ```mermaid
 flowchart TB
-    subgraph Sources["Data Sources"]
+    subgraph Sources["📥 Data Sources"]
         K8S[("Kubernetes<br/>API Server")]
         PODS["Application<br/>Pods"]
         NODES["Cluster<br/>Nodes"]
     end
 
-    subgraph Collection["Collection Layer"]
+    subgraph Collection["📡 Collection Layer"]
         ALLOY["Alloy<br/>(OTel Collector)"]
-        KSM["kube-state-metrics<br/>(optional)"]
+        KSM["kube-state-metrics<br/>⚙️ optional"]
     end
 
-    subgraph Storage["Storage Layer"]
+    subgraph Storage["💾 Storage Layer"]
         subgraph Metrics
             VM_SINGLE["VictoriaMetrics<br/>Single"]
             VM_CLUSTER["VictoriaMetrics<br/>Cluster"]
@@ -59,20 +70,20 @@ flowchart TB
         LOKI["Loki<br/>(Logs)"]
         
         subgraph Traces
-            VT["VictoriaTraces"]
-            JAEGER["Jaeger<br/>(optional)"]
+            VT["VictoriaTraces<br/>⚙️ optional"]
+            JAEGER["Jaeger<br/>⚙️ optional"]
         end
     end
 
-    subgraph Alerting["Alerting Layer"]
+    subgraph Alerting["🚨 Alerting Layer"]
         VMALERT["VMAlert<br/>(Rule Evaluation)"]
-        AM["Alertmanager<br/>(optional)"]
+        AM["Alertmanager<br/>⚙️ optional"]
     end
 
-    subgraph Visualization["Visualization Layer"]
+    subgraph Visualization["📊 Visualization Layer"]
         GRAFANA_OP["Grafana<br/>Operator"]
         GRAFANA["Grafana<br/>Instance"]
-        KIALI["Kiali<br/>(optional)"]
+        KIALI["Kiali<br/>⚙️ optional"]
     end
 
     %% Data Collection Flows
@@ -105,54 +116,64 @@ flowchart TB
     AM -->|"datasource"| GRAFANA
 ```
 
-> **Note**: For detailed architecture diagrams including data flow, alert sequences, and component dependencies, see [docs/architecture.md](docs/architecture.md).
+> 📘 **Note**: Components marked with ⚙️ are optional and disabled by default. For detailed architecture diagrams including data flow, alert sequences, and component dependencies, see [docs/architecture.md](docs/architecture.md).
 
 ### Data Flow
 
-1. **Metrics**: Alloy scrapes metrics from Kubernetes components and applications, forwards to VictoriaMetrics
-2. **Logs**: Alloy collects container logs and forwards to Loki
-3. **Traces**: Applications send traces via OTLP to Alloy, which forwards to VictoriaTraces or Jaeger
-4. **Alerting**: VMAlert evaluates rules against VictoriaMetrics and sends alerts to Alertmanager
-5. **Visualization**: Grafana queries all backends with auto-configured datasources
+| Step | Flow |
+|------|------|
+| 📊 **Metrics** | Alloy scrapes metrics from Kubernetes components and applications → VictoriaMetrics |
+| 📝 **Logs** | Alloy collects container logs → Loki |
+| 🔍 **Traces** | Applications send traces via OTLP → Alloy → VictoriaTraces or Jaeger |
+| 🚨 **Alerting** | VMAlert evaluates rules against VictoriaMetrics → Alertmanager |
+| 👁️ **Visualization** | Grafana queries all backends with auto-configured datasources |
 
-## Features
+---
 
-- **Metrics**
-  - VictoriaMetrics for efficient time-series storage (single or cluster mode)
-  - Pre-configured Kubernetes and node monitoring
-  - Recording rules for optimized queries
-  - Long-term retention support
+## ✨ Features
 
-- **Logs**
-  - Loki for log aggregation
-  - Automatic container log collection via Alloy
-  - Log-to-trace correlation
+### 📊 Metrics
+- VictoriaMetrics for efficient time-series storage (single or cluster mode)
+- Pre-configured Kubernetes and node monitoring
+- Recording rules for optimized queries
+- Long-term retention support
 
-- **Traces**
-  - VictoriaTraces or Jaeger for distributed tracing
-  - OTLP receiver support
-  - Trace-to-log and trace-to-metrics correlation
+### 📝 Logs
+- Loki for log aggregation
+- Automatic container log collection via Alloy
+- Log-to-trace correlation
 
-- **Visualization**
-  - Grafana Operator for CRD-based management
-  - Auto-configured datasources
-  - Pre-built dashboards from community mixins
-  - Custom dashboard support
+### 🔍 Traces
+- VictoriaTraces or Jaeger for distributed tracing
+- OTLP receiver support
+- Trace-to-log and trace-to-metrics correlation
 
-- **Alerting**
-  - VMAlert for rule evaluation
-  - Alertmanager for alert routing
-  - Pre-configured Kubernetes alerts
-  - Customizable alert rules
+### 📈 Visualization
+- Grafana Operator for CRD-based management
+- Auto-configured datasources
+- Pre-built dashboards from community mixins
+- Custom dashboard support
 
-## Prerequisites
+### 🚨 Alerting
+- VMAlert for rule evaluation
+- Alertmanager for alert routing
+- Pre-configured Kubernetes alerts
+- Customizable alert rules
 
-- Kubernetes 1.25+
-- Helm 3.10+
-- kubectl configured to access your cluster
-- (Optional) For mixins: jsonnet-bundler (`jb`)
+---
 
-## Quick Start
+## 📋 Prerequisites
+
+| Requirement | Version |
+|-------------|---------|
+| Kubernetes | 1.25+ |
+| Helm | 3.10+ |
+| kubectl | Configured for your cluster |
+| jsonnet-bundler | (Optional) For mixins |
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 # Add the Helm repository
@@ -169,7 +190,9 @@ kubectl port-forward svc/observability-k8s-observability-stack-grafana-service 3
 # Open http://localhost:3000
 ```
 
-## Installation
+---
+
+## 📥 Installation
 
 ### Basic Installation
 
@@ -190,6 +213,7 @@ global:
 victoriametrics:
   mode: "cluster"  # Use cluster mode for production
 
+# Enable optional components
 alertmanager:
   enabled: true
   config:
@@ -210,9 +234,9 @@ helm install observability k8s-observability/k8s-observability-stack \
   --create-namespace
 ```
 
-### Production Installation
+### 🏭 Production Installation
 
-For production environments, consider:
+For production environments, consider enabling additional components:
 
 ```yaml
 # production-values.yaml
@@ -238,6 +262,7 @@ vmcluster:
 loki:
   deploymentMode: simple-scalable
 
+# Optional components for production
 alertmanager:
   enabled: true
   persistence:
@@ -246,9 +271,14 @@ alertmanager:
 
 kube-state-metrics:
   enabled: true
+
+victoriatraces:
+  enabled: true  # If you need distributed tracing
 ```
 
-## Configuration
+---
+
+## ⚙️ Configuration
 
 ### Global Settings
 
@@ -260,18 +290,18 @@ kube-state-metrics:
 
 ### Component Toggles
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `grafana-operator.enabled` | Enable Grafana Operator | `true` |
-| `grafana.instance.enabled` | Create Grafana instance | `true` |
-| `loki.enabled` | Enable Loki | `true` |
-| `alloy.enabled` | Enable Alloy collector | `true` |
-| `victoriametrics.mode` | VM mode: "single" or "cluster" | `"single"` |
-| `victoriatraces.enabled` | Enable VictoriaTraces | `false` |
-| `alertmanager.enabled` | Enable Alertmanager | `false` |
-| `jaeger.enabled` | Enable Jaeger | `false` |
-| `kiali.enabled` | Enable Kiali | `false` |
-| `kube-state-metrics.enabled` | Enable kube-state-metrics | `false` |
+| Parameter | Description | Default | Status |
+|-----------|-------------|---------|--------|
+| `grafana-operator.enabled` | Enable Grafana Operator | `true` | 🟢 Core |
+| `grafana.instance.enabled` | Create Grafana instance | `true` | 🟢 Core |
+| `loki.enabled` | Enable Loki | `true` | 🟢 Core |
+| `alloy.enabled` | Enable Alloy collector | `true` | 🟢 Core |
+| `victoriametrics.mode` | VM mode: "single" or "cluster" | `"single"` | 🟢 Core |
+| `kube-state-metrics.enabled` | Enable kube-state-metrics | `false` | ⚙️ Optional |
+| `victoriatraces.enabled` | Enable VictoriaTraces | `false` | ⚙️ Optional |
+| `alertmanager.enabled` | Enable Alertmanager | `false` | ⚙️ Optional |
+| `jaeger.enabled` | Enable Jaeger | `false` | ⚙️ Optional |
+| `kiali.enabled` | Enable Kiali | `false` | ⚙️ Optional |
 
 ### VictoriaMetrics Configuration
 
@@ -325,32 +355,126 @@ grafana:
         url: http://prometheus.other-namespace:9090
 ```
 
-### Full Configuration Reference
+### 📖 Full Configuration Reference
 
 See [values.yaml](values.yaml) for all available configuration options.
 
-## Components
+---
 
-### Core Components (Enabled by Default)
+## 🧩 Components
 
-| Component | Description | Chart |
-|-----------|-------------|-------|
-| Grafana Operator | Manages Grafana instances via CRDs | [grafana-operator](https://artifacthub.io/packages/helm/grafana/grafana-operator) |
-| Loki | Log aggregation system | [loki](https://artifacthub.io/packages/helm/grafana/loki) |
-| Alloy | OpenTelemetry collector | [alloy](https://artifacthub.io/packages/helm/grafana/alloy) |
-| VictoriaMetrics | Time-series database | [victoria-metrics-single](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single) |
+### 🟢 Core Components (Enabled by Default)
 
-### Optional Components (Disabled by Default)
+These components form the foundation of your observability stack:
 
-| Component | Description | Chart |
-|-----------|-------------|-------|
-| kube-state-metrics | Kubernetes state exporter | [kube-state-metrics](https://artifacthub.io/packages/helm/bitnami/kube-state-metrics) |
-| VictoriaTraces | Distributed tracing backend | [victoria-traces-single](https://artifacthub.io/packages/helm/victoriametrics/victoria-traces-single) |
-| Alertmanager | Alert routing and management | [alertmanager](https://artifacthub.io/packages/helm/prometheus-community/alertmanager) |
-| Jaeger | Distributed tracing (alternative) | [jaeger](https://artifacthub.io/packages/helm/jaegertracing/jaeger) |
-| Kiali | Service mesh observability | [kiali-server](https://artifacthub.io/packages/helm/kiali/kiali-server) |
+| Component | Description | Chart | Purpose |
+|-----------|-------------|-------|---------|
+| **Grafana Operator** | Manages Grafana instances via CRDs | [grafana-operator](https://artifacthub.io/packages/helm/grafana/grafana-operator) | Dashboard & datasource management |
+| **Loki** | Log aggregation system | [loki](https://artifacthub.io/packages/helm/grafana/loki) | Centralized logging |
+| **Alloy** | OpenTelemetry collector | [alloy](https://artifacthub.io/packages/helm/grafana/alloy) | Metrics, logs, traces collection |
+| **VictoriaMetrics** | Time-series database | [victoria-metrics-single](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single) | Metrics storage |
 
-## Upgrading
+### ⚙️ Optional Components (Disabled by Default)
+
+Enable these components based on your needs:
+
+| Component | Description | Chart | Enable With | Use Case |
+|-----------|-------------|-------|-------------|----------|
+| **kube-state-metrics** | Kubernetes state exporter | [kube-state-metrics](https://artifacthub.io/packages/helm/bitnami/kube-state-metrics) | `kube-state-metrics.enabled: true` | Detailed K8s object metrics (deployments, pods, etc.) |
+| **VictoriaTraces** | Distributed tracing backend | [victoria-traces-single](https://artifacthub.io/packages/helm/victoriametrics/victoria-traces-single) | `victoriatraces.enabled: true` | Application tracing with OTLP support |
+| **Alertmanager** | Alert routing and management | [alertmanager](https://artifacthub.io/packages/helm/prometheus-community/alertmanager) | `alertmanager.enabled: true` | Alert notifications (Slack, PagerDuty, etc.) |
+| **Jaeger** | Distributed tracing (alternative) | [jaeger](https://artifacthub.io/packages/helm/jaegertracing/jaeger) | `jaeger.enabled: true` | Alternative to VictoriaTraces |
+| **Kiali** | Service mesh observability | [kiali-server](https://artifacthub.io/packages/helm/kiali/kiali-server) | `kiali.enabled: true` | Istio service mesh visualization |
+
+#### 💡 When to Enable Optional Components
+
+```yaml
+# Scenario 1: Production with alerting
+alertmanager:
+  enabled: true
+
+# Scenario 2: Need detailed Kubernetes metrics
+kube-state-metrics:
+  enabled: true
+
+# Scenario 3: Distributed tracing for microservices
+victoriatraces:
+  enabled: true
+# OR if you prefer Jaeger
+jaeger:
+  enabled: true
+
+# Scenario 4: Running Istio service mesh
+kiali:
+  enabled: true
+```
+
+---
+
+## 🔄 GitOps Deployment
+
+Deploy the observability stack using your favorite GitOps tool.
+
+### Argo CD
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-stack
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://theorigamicorporation.github.io/k8s-observability-stack
+    chart: k8s-observability-stack
+    targetRevision: 0.1.0
+    helm:
+      values: |
+        global:
+          clusterName: "production"
+        alertmanager:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+```
+
+### Flux CD
+
+```yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: observability-stack
+  namespace: observability
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: k8s-observability-stack
+      version: "0.1.x"
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-observability
+        namespace: flux-system
+  values:
+    global:
+      clusterName: "production"
+    alertmanager:
+      enabled: true
+```
+
+> 📘 **For detailed examples** including multi-cluster setups, Kustomize patches, and external secrets integration, see **[docs/deployment-examples.md](docs/deployment-examples.md)**.
+
+---
+
+## ⬆️ Upgrading
 
 ### From v0.x to v0.y
 
@@ -372,7 +496,9 @@ helm upgrade observability k8s-observability/k8s-observability-stack \
 
 The chart automatically tracks subchart updates. Major version changes may require value migrations. Check the changelog for breaking changes.
 
-## Local Development
+---
+
+## 🛠️ Local Development
 
 ### Prerequisites
 
@@ -416,7 +542,7 @@ make install VALUES_FILE=ci/test-values/default-values.yaml
 make port-forward-grafana
 ```
 
-### Makefile Targets
+### 📋 Makefile Targets
 
 ```bash
 make help              # Show all available targets
@@ -458,7 +584,7 @@ Override defaults with environment variables:
 make install RELEASE_NAME=my-stack NAMESPACE=monitoring VALUES_FILE=my-values.yaml
 ```
 
-### Running Tests
+### 🧪 Running Tests
 
 ```bash
 # Run all tests (lint + template render)
@@ -475,7 +601,7 @@ make ct-install
 make template > rendered.yaml
 ```
 
-### Updating Mixins
+### 🔄 Updating Mixins
 
 The chart uses a mixin-based approach similar to kube-prometheus-stack:
 
@@ -516,7 +642,7 @@ To customize mixin configuration, edit `mixins/config.libsonnet`:
 }
 ```
 
-### Updating Dependencies
+### 📦 Updating Dependencies
 
 ```bash
 # Check for updates
@@ -526,11 +652,13 @@ To customize mixin configuration, edit `mixins/config.libsonnet`:
 ./hack/update-deps.sh --update
 ```
 
-## Troubleshooting
+---
+
+## 🔧 Troubleshooting
 
 ### Common Issues
 
-#### Grafana not starting
+#### ❌ Grafana not starting
 
 ```bash
 # Check Grafana Operator logs
@@ -541,7 +669,7 @@ kubectl get grafana -n observability
 kubectl describe grafana <name> -n observability
 ```
 
-#### VictoriaMetrics not receiving metrics
+#### ❌ VictoriaMetrics not receiving metrics
 
 ```bash
 # Check Alloy logs
@@ -551,7 +679,7 @@ kubectl logs -l app.kubernetes.io/name=alloy -n observability
 kubectl exec -it deploy/alloy -n observability -- curl -s http://localhost:12345/metrics | grep remote_write
 ```
 
-#### High memory usage in VictoriaMetrics
+#### ❌ High memory usage in VictoriaMetrics
 
 Consider switching to cluster mode:
 
@@ -566,7 +694,7 @@ vmcluster:
         memory: 4Gi
 ```
 
-#### Logs not appearing in Loki
+#### ❌ Logs not appearing in Loki
 
 ```bash
 # Check Alloy log collection
@@ -576,7 +704,7 @@ kubectl logs -l app.kubernetes.io/name=alloy -n observability | grep loki
 kubectl exec -it deploy/loki -n observability -- wget -qO- http://localhost:3100/ready
 ```
 
-### Debug Mode
+### 🐛 Debug Mode
 
 Enable debug logging:
 
@@ -592,7 +720,7 @@ loki:
       log_level: debug
 ```
 
-### Getting Help
+### 📚 Getting Help
 
 1. Check the [GitHub Issues](https://github.com/theorigamicorporation/k8s-observability-stack/issues)
 2. Review component-specific documentation:
@@ -600,7 +728,9 @@ loki:
    - [Loki Docs](https://grafana.com/docs/loki/latest/)
    - [Grafana Operator Docs](https://grafana.github.io/grafana-operator/)
 
-## Contributing
+---
+
+## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -618,7 +748,43 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 - **Release**: Triggered on version tags (v*)
 - **Dependency Updates**: Weekly automated PRs for subchart updates
 
-## Roadmap
+---
+
+## 🙏 Acknowledgments
+
+This project builds upon the excellent work of these open-source projects:
+
+### Core Dependencies
+
+| Project | Description | Link |
+|---------|-------------|------|
+| **VictoriaMetrics** | Fast, cost-effective monitoring solution | [GitHub](https://github.com/VictoriaMetrics/VictoriaMetrics) |
+| **Grafana** | The open observability platform | [GitHub](https://github.com/grafana/grafana) |
+| **Grafana Operator** | Kubernetes operator for Grafana | [GitHub](https://github.com/grafana/grafana-operator) |
+| **Loki** | Horizontally-scalable log aggregation | [GitHub](https://github.com/grafana/loki) |
+| **Alloy** | OpenTelemetry collector distribution | [GitHub](https://github.com/grafana/alloy) |
+
+### Optional Dependencies
+
+| Project | Description | Link |
+|---------|-------------|------|
+| **VictoriaTraces** | OpenTelemetry-compatible tracing backend | [GitHub](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/app/vmsingle) |
+| **Jaeger** | Distributed tracing platform | [GitHub](https://github.com/jaegertracing/jaeger) |
+| **Alertmanager** | Alert handling for Prometheus | [GitHub](https://github.com/prometheus/alertmanager) |
+| **kube-state-metrics** | Kubernetes metrics generator | [GitHub](https://github.com/kubernetes/kube-state-metrics) |
+| **Kiali** | Service mesh observability | [GitHub](https://github.com/kiali/kiali) |
+
+### Inspiration
+
+This project was inspired by:
+- [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) - The de-facto standard for Prometheus on Kubernetes
+- [victoria-metrics-k8s-stack](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack) - VictoriaMetrics Kubernetes monitoring stack
+
+**Special thanks** to all contributors and maintainers of these projects!
+
+---
+
+## 🗺️ Roadmap
 
 - [ ] Tempo support as alternative tracing backend
 - [ ] OpenTelemetry Collector as alternative to Alloy
@@ -628,10 +794,16 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 - [ ] Advanced mixin customization
 - [ ] Helm chart testing with different Kubernetes distributions
 
-## License
+---
+
+## 📄 License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-**Maintained by [The Origami Corporation](https://github.com/theorigamicorporation)**
+<p align="center">
+  <strong>Maintained by <a href="https://github.com/theorigamicorporation">The Origami Corporation</a></strong>
+  <br><br>
+  ⭐ Star this repo if you find it useful! ⭐
+</p>

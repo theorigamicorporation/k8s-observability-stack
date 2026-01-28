@@ -173,30 +173,217 @@ jobs:
             helm repo index . --url https://theorigamicorporation.github.io/k8s-observability-stack
           fi
           
-          # Create a simple index.html
+          # Create index.html
           cat > index.html << 'HTMLEOF'
           <!DOCTYPE html>
-          <html>
+          <html lang="en">
           <head>
-            <title>k8s-observability-stack Helm Repository</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>k8s-observability-stack - Helm Repository</title>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
             <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-              h1 { color: #333; }
-              pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
-              a { color: #0366d6; }
+              :root {
+                --bg-primary: #0d1117;
+                --bg-secondary: #161b22;
+                --bg-tertiary: #21262d;
+                --text-primary: #f0f6fc;
+                --text-secondary: #8b949e;
+                --accent: #58a6ff;
+                --accent-hover: #79b8ff;
+                --success: #3fb950;
+                --warning: #d29922;
+                --border: #30363d;
+                --gradient-start: #6366f1;
+                --gradient-end: #8b5cf6;
+              }
+              * { box-sizing: border-box; margin: 0; padding: 0; }
+              body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                line-height: 1.6;
+                min-height: 100vh;
+              }
+              .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+              .hero {
+                text-align: center;
+                padding: 60px 0;
+                background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+                border-radius: 16px;
+                margin-bottom: 40px;
+              }
+              .hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; }
+              .hero p { font-size: 1.2rem; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+              .badge { 
+                display: inline-block; 
+                background: rgba(255,255,255,0.2); 
+                padding: 6px 12px; 
+                border-radius: 20px; 
+                font-size: 0.85rem;
+                margin-top: 20px;
+              }
+              .section { margin-bottom: 40px; }
+              .section h2 { 
+                font-size: 1.5rem; 
+                margin-bottom: 20px; 
+                display: flex; 
+                align-items: center; 
+                gap: 10px;
+              }
+              .section h2::before { content: ''; width: 4px; height: 24px; background: var(--accent); border-radius: 2px; }
+              .card {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 24px;
+                margin-bottom: 16px;
+              }
+              .code-block {
+                background: var(--bg-tertiary);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                padding: 20px;
+                overflow-x: auto;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 0.9rem;
+              }
+              .code-block code { color: var(--text-primary); }
+              .code-block .comment { color: var(--text-secondary); }
+              .code-block .command { color: var(--success); }
+              .components-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+              .component {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 20px;
+                transition: border-color 0.2s, transform 0.2s;
+              }
+              .component:hover { border-color: var(--accent); transform: translateY(-2px); }
+              .component h3 { font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+              .component p { color: var(--text-secondary); font-size: 0.9rem; }
+              .component .tag {
+                display: inline-block;
+                font-size: 0.75rem;
+                padding: 2px 8px;
+                border-radius: 12px;
+                margin-left: auto;
+              }
+              .tag-core { background: rgba(59, 185, 80, 0.2); color: var(--success); }
+              .tag-optional { background: rgba(210, 153, 34, 0.2); color: var(--warning); }
+              .links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
+              .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 12px 24px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: 500;
+                transition: all 0.2s;
+              }
+              .btn-primary { background: var(--accent); color: var(--bg-primary); }
+              .btn-primary:hover { background: var(--accent-hover); }
+              .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
+              .btn-secondary:hover { border-color: var(--accent); }
+              .footer {
+                text-align: center;
+                padding: 40px 0;
+                color: var(--text-secondary);
+                border-top: 1px solid var(--border);
+                margin-top: 60px;
+              }
+              .footer a { color: var(--accent); text-decoration: none; }
+              .footer a:hover { text-decoration: underline; }
+              @media (max-width: 600px) {
+                .hero h1 { font-size: 1.8rem; }
+                .hero p { font-size: 1rem; }
+                .container { padding: 20px 16px; }
+              }
             </style>
           </head>
           <body>
-            <h1>k8s-observability-stack Helm Repository</h1>
-            <p>Complete Kubernetes observability stack with VictoriaMetrics, Loki, Grafana, and more.</p>
-            <h2>Quick Start</h2>
-            <pre>
-          helm repo add k8s-observability https://theorigamicorporation.github.io/k8s-observability-stack
-          helm repo update
-          helm install observability k8s-observability/k8s-observability-stack
-            </pre>
-            <h2>Documentation</h2>
-            <p>See the <a href="https://github.com/theorigamicorporation/k8s-observability-stack">GitHub repository</a> for full documentation.</p>
+            <div class="container">
+              <div class="hero">
+                <h1>k8s-observability-stack</h1>
+                <p>Complete Kubernetes observability stack with VictoriaMetrics, Loki, Grafana, and more.</p>
+                <span class="badge">Helm Repository</span>
+              </div>
+              
+              <div class="section">
+                <h2>Quick Start</h2>
+                <div class="code-block">
+                  <code><span class="comment"># Add the Helm repository</span>
+          <span class="command">helm repo add</span> k8s-observability https://theorigamicorporation.github.io/k8s-observability-stack
+          <span class="command">helm repo update</span>
+
+          <span class="comment"># Install with default configuration</span>
+          <span class="command">helm install</span> observability k8s-observability/k8s-observability-stack \
+            --namespace observability --create-namespace
+
+          <span class="comment"># Access Grafana</span>
+          <span class="command">kubectl port-forward</span> svc/observability-k8s-observability-stack-grafana-service 3000:3000 -n observability</code>
+                </div>
+              </div>
+
+              <div class="section">
+                <h2>Components</h2>
+                <div class="components-grid">
+                  <div class="component">
+                    <h3>VictoriaMetrics <span class="tag tag-core">Core</span></h3>
+                    <p>High-performance time-series database for metrics storage</p>
+                  </div>
+                  <div class="component">
+                    <h3>Grafana <span class="tag tag-core">Core</span></h3>
+                    <p>Observability platform with dashboards and alerting</p>
+                  </div>
+                  <div class="component">
+                    <h3>Loki <span class="tag tag-core">Core</span></h3>
+                    <p>Horizontally-scalable log aggregation system</p>
+                  </div>
+                  <div class="component">
+                    <h3>Alloy <span class="tag tag-core">Core</span></h3>
+                    <p>OpenTelemetry collector for metrics, logs, traces</p>
+                  </div>
+                  <div class="component">
+                    <h3>Alertmanager <span class="tag tag-optional">Optional</span></h3>
+                    <p>Alert routing and notification management</p>
+                  </div>
+                  <div class="component">
+                    <h3>VictoriaTraces <span class="tag tag-optional">Optional</span></h3>
+                    <p>Distributed tracing with OTLP support</p>
+                  </div>
+                  <div class="component">
+                    <h3>Jaeger <span class="tag tag-optional">Optional</span></h3>
+                    <p>Alternative distributed tracing platform</p>
+                  </div>
+                  <div class="component">
+                    <h3>Kiali <span class="tag tag-optional">Optional</span></h3>
+                    <p>Service mesh observability for Istio</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <h2>Resources</h2>
+                <div class="links">
+                  <a href="https://github.com/theorigamicorporation/k8s-observability-stack" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    GitHub
+                  </a>
+                  <a href="https://github.com/theorigamicorporation/k8s-observability-stack/releases" class="btn btn-secondary">Releases</a>
+                  <a href="https://github.com/theorigamicorporation/k8s-observability-stack/blob/main/README.md" class="btn btn-secondary">Documentation</a>
+                  <a href="./index.yaml" class="btn btn-secondary">index.yaml</a>
+                </div>
+              </div>
+
+              <div class="footer">
+                <p>Maintained by <a href="https://github.com/theorigamicorporation">The Origami Corporation</a></p>
+                <p style="margin-top: 8px; font-size: 0.9rem;">Licensed under Apache 2.0</p>
+              </div>
+            </div>
           </body>
           </html>
           HTMLEOF
