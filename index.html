@@ -228,7 +228,14 @@
         </div>
       </div>
       <div class="generator-output" id="generator-output">
-        <div class="generator-label">Generated values.yaml:</div>
+        <div class="generator-label">Option 1: Helm install with --set flags</div>
+        <div class="code-wrapper">
+          <button class="copy-btn" onclick="copyCode('generated-command')" title="Copy to clipboard">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+          <pre class="code-block" id="generated-command"></pre>
+        </div>
+        <div class="generator-label" style="margin-top: 16px;">Option 2: values.yaml file</div>
         <div class="code-wrapper">
           <button class="copy-btn" onclick="copyCode('generated-values')" title="Copy to clipboard">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -290,6 +297,7 @@
     function updateGeneratedValues() {
       const output = document.getElementById('generator-output');
       const valuesEl = document.getElementById('generated-values');
+      const commandEl = document.getElementById('generated-command');
       
       if (selectedComponents.size === 0) {
         output.classList.remove('visible');
@@ -297,12 +305,20 @@
       }
       
       output.classList.add('visible');
-      let yaml = '<span class="comment"># values.yaml - Generated configuration</span>\n';
       
+      // Generate helm install command with --set flags
+      let command = '<span class="command">helm install</span> observability k8s-observability/k8s-observability-stack \\\n';
+      command += '  --namespace observability --create-namespace';
+      selectedComponents.forEach(key => {
+        command += ` \\\n  <span class="key">--set</span> <span class="value">${key}.enabled=true</span>`;
+      });
+      commandEl.innerHTML = command;
+      
+      // Generate values.yaml content
+      let yaml = '<span class="comment"># values.yaml - Generated configuration</span>\n';
       selectedComponents.forEach(key => {
         yaml += `\n<span class="key">${key}</span>:\n  <span class="key">enabled</span>: <span class="value">true</span>\n`;
       });
-      
       valuesEl.innerHTML = yaml;
     }
     
