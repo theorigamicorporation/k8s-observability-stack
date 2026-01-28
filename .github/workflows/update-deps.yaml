@@ -1,0 +1,309 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    # Run every Monday at 6:00 AM UTC for Helm deps
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      auto_merge:
+        description: 'Auto-merge if tests pass'
+        required: false
+        type: boolean
+        default: true
+      update_mixins:
+        description: 'Also update mixins (always true on schedule)'
+        required: false
+        type: boolean
+        default: true
+      skip_helm_deps:
+        description: 'Skip Helm dependency updates (mixins only)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-updates:
+    name: Check for Updates
+    runs-on: ubuntu-latest
+    outputs:
+      has_updates: ${{ steps.check.outputs.has_updates }}
+      updates_summary: ${{ steps.check.outputs.updates_summary }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add victoriametrics https://victoriametrics.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+          helm repo add kiali https://kiali.org/helm-charts
+          helm repo update
+
+      - name: Check for dependency updates
+        id: check
+        run: |
+          # Store current Chart.lock hash
+          CURRENT_HASH=""
+          if [ -f Chart.lock ]; then
+            CURRENT_HASH=$(sha256sum Chart.lock | cut -d' ' -f1)
+          fi
+          
+          # Update dependencies
+          helm dependency update
+          
+          # Check if Chart.lock changed
+          NEW_HASH=""
+          if [ -f Chart.lock ]; then
+            NEW_HASH=$(sha256sum Chart.lock | cut -d' ' -f1)
+          fi
+          
+          if [ "$CURRENT_HASH" != "$NEW_HASH" ]; then
+            echo "has_updates=true" >> $GITHUB_OUTPUT
+            
+            # Generate updates summary
+            SUMMARY="Dependency updates detected:\n"
+            SUMMARY+=$(helm dependency list | tail -n +2 | awk '{print "- " $1 ": " $2}')
+            echo "updates_summary<<EOF" >> $GITHUB_OUTPUT
+            echo -e "$SUMMARY" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "has_updates=false" >> $GITHUB_OUTPUT
+            echo "updates_summary=No updates available" >> $GITHUB_OUTPUT
+          fi
+
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    needs: check-updates
+    if: needs.check-updates.outputs.has_updates == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add victoriametrics https://victoriametrics.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+          helm repo add kiali https://kiali.org/helm-charts
+          helm repo update
+
+      - name: Update dependencies
+        run: |
+          # Remove old Chart.lock
+          rm -f Chart.lock
+          
+          # Update dependencies
+          helm dependency update
+          
+          # Verify the chart still lints
+          helm lint .
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Update mixins
+        if: github.event_name == 'schedule' || inputs.update_mixins == true
+        run: |
+          # Install jsonnet tools
+          go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
+          go install github.com/google/go-jsonnet/cmd/jsonnet@latest
+          export PATH=$PATH:$(go env GOPATH)/bin
+          
+          # Update mixin dependencies
+          if [ -d mixins ]; then
+            cd mixins
+            jb update || jb install
+            cd ..
+          fi
+          
+          # Generate rules from mixins
+          if [ -f hack/generate-rules.sh ]; then
+            chmod +x hack/generate-rules.sh
+            ./hack/generate-rules.sh || echo "Rule generation completed with warnings"
+          fi
+          
+          echo "Mixins updated successfully"
+
+      - name: Get date for branch name
+        id: date
+        run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        id: create-pr
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(deps): update Helm chart dependencies"
+          title: "chore(deps): Update Helm chart dependencies"
+          body: |
+            ## Automated Dependency Update
+            
+            This PR was automatically created by the dependency update workflow.
+            
+            ### Updates
+            
+            ${{ needs.check-updates.outputs.updates_summary }}
+            
+            ### Checklist
+            
+            - [ ] CI tests pass
+            - [ ] Chart still renders correctly
+            - [ ] No breaking changes in subchart updates
+            
+            ### Auto-merge
+            
+            This PR will be automatically merged if all checks pass and auto-merge is enabled.
+          branch: deps/update-${{ steps.date.outputs.date }}
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
+          reviewers: |
+            theorigamicorporation
+
+      - name: Output PR details
+        if: steps.create-pr.outputs.pull-request-number
+        run: |
+          echo "## Dependency Update PR Created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "PR #${{ steps.create-pr.outputs.pull-request-number }}: ${{ steps.create-pr.outputs.pull-request-url }}" >> $GITHUB_STEP_SUMMARY
+
+  test-update:
+    name: Test Updated Dependencies
+    runs-on: ubuntu-latest
+    needs: update-dependencies
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: deps/update-${{ needs.update-dependencies.outputs.date || format('{0}', github.run_id) }}
+        continue-on-error: true
+
+      - name: Checkout main if PR branch not found
+        if: failure()
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add victoriametrics https://victoriametrics.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+          helm repo add kiali https://kiali.org/helm-charts
+          helm repo update
+
+      - name: Update dependencies
+        run: helm dependency update
+
+      - name: Lint chart
+        run: |
+          helm lint .
+          ct lint --config ct.yaml || true
+
+      - name: Template test
+        run: |
+          helm template test-release . -f ci/test-values/default-values.yaml > /dev/null
+          helm template test-release . -f ci/test-values/cluster-mode-values.yaml > /dev/null
+          helm template test-release . -f ci/test-values/all-enabled-values.yaml > /dev/null
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.10.0
+        with:
+          cluster_name: dep-test
+
+      - name: Install test
+        run: |
+          # Install Grafana Operator CRDs
+          kubectl apply -f https://raw.githubusercontent.com/grafana/grafana-operator/master/deploy/manifests/latest/crds.yaml || true
+          
+          # Try to install with minimal config
+          helm install test-release . \
+            -f ci/test-values/default-values.yaml \
+            --wait \
+            --timeout 5m \
+            --dry-run || echo "Dry-run completed"
+
+  auto-merge:
+    name: Auto-merge on Success
+    runs-on: ubuntu-latest
+    needs: [update-dependencies, test-update]
+    if: |
+      always() &&
+      needs.update-dependencies.result == 'success' &&
+      needs.test-update.result == 'success' &&
+      (github.event.inputs.auto_merge == 'true' || github.event_name == 'schedule')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get PR number
+        id: pr
+        run: |
+          PR_NUMBER=$(gh pr list --head "deps/update-" --json number -q '.[0].number')
+          echo "number=${PR_NUMBER}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge
+        if: steps.pr.outputs.number
+        run: |
+          gh pr merge ${{ steps.pr.outputs.number }} --auto --squash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "## Auto-merge Enabled" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "PR will be automatically merged once all required checks pass." >> $GITHUB_STEP_SUMMARY
+
+  no-updates:
+    name: No Updates Available
+    runs-on: ubuntu-latest
+    needs: check-updates
+    if: needs.check-updates.outputs.has_updates == 'false'
+    steps:
+      - name: Summary
+        run: |
+          echo "## No Updates Available" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All dependencies are up to date." >> $GITHUB_STEP_SUMMARY

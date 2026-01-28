@@ -1,0 +1,80 @@
+{{- if and .Values.mixins.enabled .Values.mixins.nodeExporter.alerts }}
+# =============================================================================
+# Node Exporter Alert Rules
+# =============================================================================
+# This is a placeholder file. To generate alerts from node-mixin:
+#   1. Run: make mixins-install
+#   2. Run: make generate-rules
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "k8s-observability-stack.fullname" . }}-node-alerts
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: alerting-rules
+data:
+  node-alerts.yaml: |
+    groups:
+      - name: node-exporter
+        rules:
+          - alert: NodeFilesystemSpaceFillingUp
+            annotations:
+              description: 'Filesystem on {{`{{ $labels.device }}`}} at {{`{{ $labels.instance }}`}} has less than 15% available space and is filling up.'
+              summary: Filesystem is predicted to run out of space within the next 24 hours.
+            expr: |
+              (
+                node_filesystem_avail_bytes{fstype!="",job="node-exporter"} / node_filesystem_size_bytes{fstype!="",job="node-exporter"} * 100 < 15
+              and
+                predict_linear(node_filesystem_avail_bytes{fstype!="",job="node-exporter"}[6h], 24*60*60) < 0
+              and
+                node_filesystem_readonly{fstype!="",job="node-exporter"} == 0
+              )
+            for: 1h
+            labels:
+              severity: warning
+              {{- with .Values.mixins.alerts.additionalLabels }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
+          - alert: NodeFilesystemAlmostOutOfSpace
+            annotations:
+              description: 'Filesystem on {{`{{ $labels.device }}`}} at {{`{{ $labels.instance }}`}} has less than 5% available space.'
+              summary: Filesystem has less than 5% space left.
+            expr: |
+              (
+                node_filesystem_avail_bytes{fstype!="",job="node-exporter"} / node_filesystem_size_bytes{fstype!="",job="node-exporter"} * 100 < 5
+              and
+                node_filesystem_readonly{fstype!="",job="node-exporter"} == 0
+              )
+            for: 30m
+            labels:
+              severity: critical
+              {{- with .Values.mixins.alerts.additionalLabels }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
+          - alert: NodeHighCpuUsage
+            annotations:
+              description: 'CPU usage on {{`{{ $labels.instance }}`}} has been above 90% for the last 15 minutes.'
+              summary: High CPU usage detected.
+            expr: |
+              100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+            for: 15m
+            labels:
+              severity: warning
+              {{- with .Values.mixins.alerts.additionalLabels }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
+          - alert: NodeHighMemoryUsage
+            annotations:
+              description: 'Memory usage on {{`{{ $labels.instance }}`}} has been above 90% for the last 15 minutes.'
+              summary: High memory usage detected.
+            expr: |
+              (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+            for: 15m
+            labels:
+              severity: warning
+              {{- with .Values.mixins.alerts.additionalLabels }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
+{{- end }}

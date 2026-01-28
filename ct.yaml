@@ -1,0 +1,37 @@
+# chart-testing configuration
+# See https://github.com/helm/chart-testing for more options
+
+# Remote repository configuration
+remote: origin
+target-branch: main
+
+# Chart directories
+chart-dirs:
+  - .
+
+# Chart repositories required for dependencies
+chart-repos:
+  - grafana=https://grafana.github.io/helm-charts
+  - victoriametrics=https://victoriametrics.github.io/helm-charts
+  - prometheus-community=https://prometheus-community.github.io/helm-charts
+  - bitnami=https://charts.bitnami.com/bitnami
+  - jaegertracing=https://jaegertracing.github.io/helm-charts
+  - kiali=https://kiali.org/helm-charts
+
+# Validation settings
+validate-maintainers: false
+validate-chart-schema: true
+validate-yaml: true
+
+# Helm lint extra args
+helm-extra-args: "--timeout 600s"
+
+# Test configuration
+upgrade: true
+skip-missing-values: true
+
+# Excluded charts (none)
+excluded-charts: []
+
+# Debug output
+debug: false

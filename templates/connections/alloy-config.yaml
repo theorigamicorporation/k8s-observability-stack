@@ -1,0 +1,358 @@
+{{- if .Values.alloy.enabled }}
+{{/*
+Alloy Configuration (River format)
+This ConfigMap provides the complete telemetry pipeline configuration for Alloy.
+It handles:
+- Metrics collection and forwarding to VictoriaMetrics
+- Log collection and forwarding to Loki
+- Trace collection and forwarding to VictoriaTraces/Jaeger (if enabled)
+*/}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "k8s-observability-stack.alloyConfigName" . }}
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: alloy
+data:
+  config.alloy: |
+    // ==========================================================================
+    // K8s Observability Stack - Alloy Pipeline Configuration
+    // ==========================================================================
+    // This configuration sets up a complete observability pipeline:
+    // - Metrics: Kubernetes + kube-state-metrics -> VictoriaMetrics
+    // - Logs: Container logs -> Loki
+    // - Traces: OTLP -> VictoriaTraces/Jaeger (if enabled)
+    // ==========================================================================
+
+    // --------------------------------------------------------------------------
+    // Logging Configuration
+    // --------------------------------------------------------------------------
+    logging {
+      level  = "info"
+      format = "logfmt"
+    }
+
+    // --------------------------------------------------------------------------
+    // Discovery: Kubernetes Pods
+    // --------------------------------------------------------------------------
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
+
+    // --------------------------------------------------------------------------
+    // Discovery: Kubernetes Nodes
+    // --------------------------------------------------------------------------
+    discovery.kubernetes "nodes" {
+      role = "node"
+    }
+
+    // --------------------------------------------------------------------------
+    // Discovery: Kubernetes Services
+    // --------------------------------------------------------------------------
+    discovery.kubernetes "services" {
+      role = "service"
+    }
+
+    // --------------------------------------------------------------------------
+    // Relabel: Pod Metrics
+    // --------------------------------------------------------------------------
+    discovery.relabel "pod_metrics" {
+      targets = discovery.kubernetes.pods.targets
+
+      // Keep only pods with prometheus.io/scrape annotation
+      rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+        regex         = "true"
+        action        = "keep"
+      }
+
+      // Use custom port if specified
+      rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_port"]
+        regex         = "(\\d+)"
+        target_label  = "__address__"
+        replacement   = "$${1}:$${2}"
+        action        = "replace"
+      }
+
+      // Use custom path if specified
+      rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
+        regex         = "(.+)"
+        target_label  = "__metrics_path__"
+        action        = "replace"
+      }
+
+      // Add pod labels
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+        action        = "replace"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+        action        = "replace"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_node_name"]
+        target_label  = "node"
+        action        = "replace"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label  = "container"
+        action        = "replace"
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: Pod Metrics
+    // --------------------------------------------------------------------------
+    prometheus.scrape "pods" {
+      targets    = discovery.relabel.pod_metrics.output
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      scrape_interval = "{{ .Values.serviceMonitor.interval | default "30s" }}"
+      scrape_timeout  = "{{ .Values.serviceMonitor.scrapeTimeout | default "10s" }}"
+    }
+
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: Kubelet Metrics
+    // --------------------------------------------------------------------------
+    discovery.relabel "kubelet" {
+      targets = discovery.kubernetes.nodes.targets
+
+      rule {
+        target_label = "__address__"
+        replacement  = "kubernetes.default.svc:443"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_node_name"]
+        regex         = "(.+)"
+        target_label  = "__metrics_path__"
+        replacement   = "/api/v1/nodes/$${1}/proxy/metrics"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_node_name"]
+        target_label  = "node"
+      }
+    }
+
+    prometheus.scrape "kubelet" {
+      targets    = discovery.relabel.kubelet.output
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      scheme          = "https"
+      tls_config {
+        ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+        insecure_skip_verify = true
+      }
+      authorization {
+        type             = "Bearer"
+        credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: cAdvisor Metrics
+    // --------------------------------------------------------------------------
+    discovery.relabel "cadvisor" {
+      targets = discovery.kubernetes.nodes.targets
+
+      rule {
+        target_label = "__address__"
+        replacement  = "kubernetes.default.svc:443"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_node_name"]
+        regex         = "(.+)"
+        target_label  = "__metrics_path__"
+        replacement   = "/api/v1/nodes/$${1}/proxy/metrics/cadvisor"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_node_name"]
+        target_label  = "node"
+      }
+    }
+
+    prometheus.scrape "cadvisor" {
+      targets    = discovery.relabel.cadvisor.output
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      scheme = "https"
+      tls_config {
+        ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+        insecure_skip_verify = true
+      }
+      authorization {
+        type             = "Bearer"
+        credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+
+      scrape_interval = "30s"
+    }
+
+    {{- if index .Values "kube-state-metrics" "enabled" }}
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: kube-state-metrics
+    // --------------------------------------------------------------------------
+    prometheus.scrape "kube_state_metrics" {
+      targets = [
+        {"__address__" = "{{ include "k8s-observability-stack.fullname" . }}-kube-state-metrics:8080"},
+      ]
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      scrape_interval = "30s"
+      
+      // Add job label
+      params = {
+        "job" = ["kube-state-metrics"],
+      }
+    }
+    {{- end }}
+
+    // --------------------------------------------------------------------------
+    // Remote Write: VictoriaMetrics
+    // --------------------------------------------------------------------------
+    prometheus.remote_write "victoriametrics" {
+      endpoint {
+        url = "{{ include "k8s-observability-stack.vmWriteUrl" . }}"
+
+        // Queue configuration for reliability
+        queue_config {
+          capacity             = 10000
+          max_shards           = 50
+          max_samples_per_send = 2000
+        }
+
+        // Retry configuration
+        retry_on_http_429 = true
+      }
+
+      // External labels
+      external_labels = {
+        cluster = "{{ include "k8s-observability-stack.clusterName" . }}",
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // Loki: Log Collection
+    // --------------------------------------------------------------------------
+    loki.source.kubernetes "pods" {
+      targets    = discovery.kubernetes.pods.targets
+      forward_to = [loki.process.default.receiver]
+    }
+
+    // Process logs before sending to Loki
+    loki.process "default" {
+      forward_to = [loki.write.loki.receiver]
+
+      // Parse JSON logs if possible
+      stage.json {
+        expressions = {
+          level   = "level",
+          message = "msg",
+          error   = "error",
+        }
+      }
+
+      // Add labels
+      stage.labels {
+        values = {
+          level = "",
+        }
+      }
+
+      // Structured metadata
+      stage.structured_metadata {
+        values = {
+          pod       = "",
+          container = "",
+        }
+      }
+    }
+
+    // Write logs to Loki
+    loki.write "loki" {
+      endpoint {
+        url = "{{ include "k8s-observability-stack.lokiUrl" . }}/loki/api/v1/push"
+      }
+
+      external_labels = {
+        cluster = "{{ include "k8s-observability-stack.clusterName" . }}",
+      }
+    }
+
+    {{- if or .Values.victoriatraces.enabled .Values.jaeger.enabled }}
+    // --------------------------------------------------------------------------
+    // Tracing: OTLP Receiver
+    // --------------------------------------------------------------------------
+    otelcol.receiver.otlp "default" {
+      grpc {
+        endpoint = "0.0.0.0:4317"
+      }
+      http {
+        endpoint = "0.0.0.0:4318"
+      }
+
+      output {
+        traces = [otelcol.processor.batch.default.input]
+      }
+    }
+
+    // Batch processor for traces
+    otelcol.processor.batch "default" {
+      timeout             = "5s"
+      send_batch_size     = 1000
+      send_batch_max_size = 1500
+
+      output {
+        traces = [otelcol.exporter.otlp.traces.input]
+      }
+    }
+
+    // Export traces to backend
+    otelcol.exporter.otlp "traces" {
+      client {
+        {{- if .Values.victoriatraces.enabled }}
+        {{- if eq .Values.victoriatraces.mode "cluster" }}
+        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-vtcluster:4317"
+        {{- else }}
+        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-vtsingle-server:4317"
+        {{- end }}
+        {{- else if .Values.jaeger.enabled }}
+        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-jaeger-collector:4317"
+        {{- end }}
+
+        tls {
+          insecure = true
+        }
+      }
+    }
+    {{- end }}
+
+    // --------------------------------------------------------------------------
+    // Self-Monitoring
+    // --------------------------------------------------------------------------
+    prometheus.exporter.self "alloy" {}
+
+    prometheus.scrape "alloy_self" {
+      targets    = prometheus.exporter.self.alloy.targets
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      scrape_interval = "30s"
+    }
+{{- end }}

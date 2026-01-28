@@ -1,0 +1,131 @@
+# =============================================================================
+# Default Test Values
+# =============================================================================
+# This file contains minimal configuration for testing the chart with
+# default settings. It enables only the core components.
+# =============================================================================
+
+global:
+  clusterName: "test-cluster"
+
+# Core components (enabled by default)
+grafana-operator:
+  enabled: true
+
+grafana:
+  instance:
+    enabled: true
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    persistence:
+      enabled: false
+  datasources:
+    autoCreate: true
+
+loki:
+  enabled: true
+  deploymentMode: single-binary
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+  singleBinary:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    persistence:
+      enabled: false
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  gateway:
+    enabled: false
+  test:
+    enabled: false
+
+alloy:
+  enabled: true
+  alloy:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  controller:
+    type: deployment
+    replicas: 1
+
+# VictoriaMetrics single mode (default)
+victoriametrics:
+  mode: "single"
+  single:
+    enabled: true
+  cluster:
+    enabled: false
+
+vmsingle:
+  server:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
+    persistentVolume:
+      enabled: false
+    retentionPeriod: 1d
+  alertmanager:
+    enabled: false
+
+# VMAlert with minimal resources
+vmalert:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Disable all optional components
+kube-state-metrics:
+  enabled: false
+
+victoriatraces:
+  enabled: false
+
+alertmanager:
+  enabled: false
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: false
+
+# Disable mixins for faster testing
+mixins:
+  enabled: false
+
+# Disable ServiceMonitors
+serviceMonitor:
+  enabled: false

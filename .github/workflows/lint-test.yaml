@@ -1,0 +1,262 @@
+name: Lint and Test Chart
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'Chart.yaml'
+      - 'Chart.lock'
+      - 'values.yaml'
+      - 'templates/**'
+      - 'ci/**'
+      - '.github/workflows/lint-test.yaml'
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'Chart.yaml'
+      - 'Chart.lock'
+      - 'values.yaml'
+      - 'templates/**'
+      - 'ci/**'
+      - '.github/workflows/lint-test.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint Chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add victoriametrics https://victoriametrics.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+          helm repo add kiali https://kiali.org/helm-charts
+          helm repo update
+
+      - name: Run chart-testing (lint)
+        run: ct lint --config ct.yaml
+
+      - name: Helm lint
+        run: helm lint .
+
+  template-render:
+    name: Template Render Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        values:
+          - default
+          - cluster-mode
+          - all-enabled
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add victoriametrics https://victoriametrics.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+          helm repo add kiali https://kiali.org/helm-charts
+          helm repo update
+
+      - name: Update dependencies
+        run: helm dependency update
+
+      - name: Template with ${{ matrix.values }} values
+        run: |
+          helm template test-release . \
+            -f ci/test-values/${{ matrix.values }}-values.yaml \
+            --debug \
+            > rendered-${{ matrix.values }}.yaml
+
+      - name: Validate YAML syntax
+        run: |
+          python3 -c "import yaml; yaml.safe_load_all(open('rendered-${{ matrix.values }}.yaml'))"
+
+      - name: Upload rendered templates
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-templates-${{ matrix.values }}
+          path: rendered-${{ matrix.values }}.yaml
+          retention-days: 5
+
+  install-test:
+    name: Install Test
+    runs-on: ubuntu-latest
+    needs: [lint, template-render]
+    strategy:
+      fail-fast: false
+      matrix:
+        k8s-version:
+          - v1.28.13
+          - v1.29.8
+          - v1.30.4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.10.0
+        with:
+          node_image: kindest/node:${{ matrix.k8s-version }}
+          cluster_name: chart-testing
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add victoriametrics https://victoriametrics.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+          helm repo add kiali https://kiali.org/helm-charts
+          helm repo update
+
+      - name: Update dependencies
+        run: helm dependency update
+
+      - name: Install Grafana Operator CRDs
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/grafana/grafana-operator/master/deploy/manifests/latest/crds.yaml
+        continue-on-error: true
+
+      - name: Run chart-testing (install)
+        run: |
+          ct install --config ct.yaml \
+            --helm-extra-args "--timeout 10m"
+
+      - name: Debug on failure
+        if: failure()
+        run: |
+          kubectl get pods -A
+          kubectl describe pods -A
+          kubectl get events -A --sort-by='.lastTimestamp'
+
+  kubeconform:
+    name: Kubernetes Manifest Validation
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Install kubeconform
+        run: |
+          curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | \
+            tar xz -C /usr/local/bin
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add victoriametrics https://victoriametrics.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+          helm repo add kiali https://kiali.org/helm-charts
+          helm repo update
+
+      - name: Update dependencies
+        run: helm dependency update
+
+      - name: Validate manifests with kubeconform
+        run: |
+          helm template test-release . -f ci/test-values/default-values.yaml | \
+            kubeconform -strict -ignore-missing-schemas -kubernetes-version 1.29.0 -summary
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add victoriametrics https://victoriametrics.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+          helm repo add kiali https://kiali.org/helm-charts
+          helm repo update
+
+      - name: Update dependencies
+        run: helm dependency update
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'

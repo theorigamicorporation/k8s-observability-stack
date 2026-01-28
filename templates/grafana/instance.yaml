@@ -1,0 +1,131 @@
+{{- if and (index .Values "grafana-operator" "enabled") .Values.grafana.instance.enabled }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: {{ include "k8s-observability-stack.grafanaInstanceName" . }}
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+  {{- with (include "k8s-observability-stack.annotations" .) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.grafana.instance.replicas }}
+  replicas: {{ . }}
+  {{- end }}
+  
+  deployment:
+    spec:
+      template:
+        spec:
+          {{- with .Values.grafana.instance.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.grafana.instance.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.grafana.instance.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.grafana.instance.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.global.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.global.priorityClassName }}
+          priorityClassName: {{ .Values.global.priorityClassName }}
+          {{- end }}
+          containers:
+            - name: grafana
+              {{- with .Values.grafana.instance.resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .Values.grafana.instance.env }}
+              env:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .Values.grafana.instance.volumeMounts }}
+              volumeMounts:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+          {{- with .Values.grafana.instance.volumes }}
+          volumes:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+  config:
+    log:
+      mode: "console"
+    auth:
+      disable_login_form: "false"
+    security:
+      admin_user: {{ .Values.grafana.instance.adminCredentials.username | default "admin" | quote }}
+      admin_password: ${ADMIN_PASSWORD}
+    server:
+      root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+    dashboards:
+      default_home_dashboard_path: "/tmp/dashboards/kubernetes-overview.json"
+    
+  {{- if .Values.grafana.instance.persistence.enabled }}
+  persistentVolumeClaim:
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.grafana.instance.persistence.size }}
+      {{- if or .Values.grafana.instance.persistence.storageClass .Values.global.storageClass }}
+      storageClassName: {{ .Values.grafana.instance.persistence.storageClass | default .Values.global.storageClass }}
+      {{- end }}
+  {{- end }}
+
+  {{- if .Values.grafana.instance.ingress.enabled }}
+  ingress:
+    metadata:
+      {{- with .Values.grafana.instance.ingress.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.grafana.instance.ingress.ingressClassName }}
+      ingressClassName: {{ . }}
+      {{- end }}
+      rules:
+        {{- range .Values.grafana.instance.ingress.hosts }}
+        - host: {{ . | quote }}
+          http:
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: {{ include "k8s-observability-stack.grafanaInstanceName" $ }}-service
+                    port:
+                      number: 3000
+        {{- end }}
+      {{- with .Values.grafana.instance.ingress.tls }}
+      tls:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- end }}
+
+  secrets:
+    {{- if .Values.grafana.instance.adminCredentials.existingSecret }}
+    - {{ .Values.grafana.instance.adminCredentials.existingSecret }}
+    {{- else }}
+    - {{ include "k8s-observability-stack.grafanaAdminSecretName" . }}
+    {{- end }}
+    {{- with .Values.grafana.instance.additionalSecrets }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

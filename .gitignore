@@ -1,0 +1,68 @@
+# =============================================================================
+# k8s-observability-stack .gitignore
+# =============================================================================
+
+# Helm
+charts/*.tgz
+Chart.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.log
+packages/
+rendered-*.yaml
+
+# Mixin vendor (regenerated via sync-mixins.sh)
+mixins/vendor/
+mixins/jsonnetfile.lock.json
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+
+# Test outputs
+test-output/
+coverage/
+
+# Environment files (never commit secrets)
+.env
+.env.*
+*.pem
+*.key
+secrets.yaml
+*-secrets.yaml
+
+# Local development
+.local/
+*.local.yaml
+
+# External subchart values (downloaded via helm show values)
+external-values/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Python (if using any Python scripts)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node (if using any Node.js tools)
+node_modules/
+
+# Generated dashboard files (optional - remove if you want to track these)
+# dashboards/kubernetes/*.json
+# dashboards/node-exporter/*.json

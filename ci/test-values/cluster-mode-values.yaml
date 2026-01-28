@@ -1,0 +1,157 @@
+# =============================================================================
+# Cluster Mode Test Values
+# =============================================================================
+# This file tests the chart with VictoriaMetrics and VictoriaTraces in
+# cluster mode for horizontal scaling scenarios.
+# =============================================================================
+
+global:
+  clusterName: "test-cluster-mode"
+
+# Core components
+grafana-operator:
+  enabled: true
+
+grafana:
+  instance:
+    enabled: true
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    persistence:
+      enabled: false
+  datasources:
+    autoCreate: true
+
+loki:
+  enabled: true
+  deploymentMode: single-binary
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+  singleBinary:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    persistence:
+      enabled: false
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  gateway:
+    enabled: false
+  test:
+    enabled: false
+
+alloy:
+  enabled: true
+  alloy:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  controller:
+    type: deployment
+    replicas: 1
+
+# VictoriaMetrics in CLUSTER mode
+victoriametrics:
+  mode: "cluster"
+  single:
+    enabled: false
+  cluster:
+    enabled: true
+
+vmcluster:
+  vmselect:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+  vminsert:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  vmstorage:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 25m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+    persistentVolume:
+      enabled: false
+    retentionPeriod: 1d
+
+# Enable VictoriaTraces in cluster mode
+victoriatraces:
+  enabled: true
+  mode: "cluster"
+  single:
+    enabled: false
+  cluster:
+    enabled: true
+
+vtcluster:
+  replicaCount: 1
+
+# VMAlert
+vmalert:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Disable optional components
+kube-state-metrics:
+  enabled: false
+
+alertmanager:
+  enabled: false
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: false
+
+# Disable mixins for faster testing
+mixins:
+  enabled: false
+
+# Disable ServiceMonitors
+serviceMonitor:
+  enabled: false

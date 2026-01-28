@@ -1,0 +1,240 @@
+# =============================================================================
+# All Components Enabled Test Values
+# =============================================================================
+# This file tests the chart with ALL components enabled to verify
+# full integration and configuration compatibility.
+# =============================================================================
+
+global:
+  clusterName: "test-all-enabled"
+
+# Core components
+grafana-operator:
+  enabled: true
+
+grafana:
+  instance:
+    enabled: true
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    persistence:
+      enabled: false
+  datasources:
+    autoCreate: true
+    victoriametrics:
+      enabled: true
+      isDefault: true
+    loki:
+      enabled: true
+    tracing:
+      enabled: true
+  dashboards:
+    enabled: true
+    providers:
+      kubernetes:
+        enabled: true
+      nodeExporter:
+        enabled: true
+      victoriametrics:
+        enabled: true
+
+loki:
+  enabled: true
+  deploymentMode: single-binary
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+  singleBinary:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    persistence:
+      enabled: false
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  gateway:
+    enabled: false
+  test:
+    enabled: false
+
+alloy:
+  enabled: true
+  alloy:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  controller:
+    type: deployment
+    replicas: 1
+
+# VictoriaMetrics single mode
+victoriametrics:
+  mode: "single"
+  single:
+    enabled: true
+  cluster:
+    enabled: false
+
+vmsingle:
+  server:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
+    persistentVolume:
+      enabled: false
+    retentionPeriod: 1d
+  alertmanager:
+    enabled: false
+
+# VMAlert
+vmalert:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Enable kube-state-metrics
+kube-state-metrics:
+  enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+# Enable VictoriaTraces
+victoriatraces:
+  enabled: true
+  mode: "single"
+  single:
+    enabled: true
+  cluster:
+    enabled: false
+
+vtsingle:
+  server:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    persistentVolume:
+      enabled: false
+
+# Enable Alertmanager
+alertmanager:
+  enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+  persistence:
+    enabled: false
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['alertname']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'null'
+    receivers:
+      - name: 'null'
+
+# Enable Jaeger (alternative tracing)
+jaeger:
+  enabled: true
+  provisionDataStore:
+    cassandra: false
+    elasticsearch: false
+    kafka: false
+  allInOne:
+    enabled: true
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  agent:
+    enabled: false
+  collector:
+    enabled: false
+  query:
+    enabled: false
+  storage:
+    type: memory
+
+# Enable Kiali
+kiali:
+  enabled: true
+  auth:
+    strategy: anonymous
+  external_services:
+    prometheus:
+      url: ""
+    grafana:
+      enabled: true
+      url: ""
+
+# Enable mixins
+mixins:
+  enabled: true
+  kubernetes:
+    enabled: true
+    dashboards: true
+    alerts: true
+  nodeExporter:
+    enabled: true
+    dashboards: true
+    alerts: true
+  victoriametrics:
+    enabled: true
+    dashboards: true
+    alerts: true
+  alerts:
+    enabled: true
+
+# Enable ServiceMonitors
+serviceMonitor:
+  enabled: true
+  interval: 60s
+  scrapeTimeout: 30s

@@ -1,0 +1,114 @@
+================================================================================
+  K8s Observability Stack has been installed!
+================================================================================
+
+{{ if .Values.grafana.instance.enabled -}}
+GRAFANA:
+  Access Grafana dashboard:
+{{- if .Values.grafana.instance.ingress.enabled }}
+  URL: http{{ if .Values.grafana.instance.ingress.tls }}s{{ end }}://{{ (index .Values.grafana.instance.ingress.hosts 0) }}
+{{- else }}
+  kubectl port-forward svc/{{ include "k8s-observability-stack.grafanaInstanceName" . }}-service 3000:3000 -n {{ .Release.Namespace }}
+  Then open: http://localhost:3000
+{{- end }}
+
+  Default credentials (if not using external auth):
+    Username: {{ .Values.grafana.instance.adminCredentials.username }}
+    Password: kubectl get secret {{ include "k8s-observability-stack.grafanaAdminSecretName" . }} -n {{ .Release.Namespace }} -o jsonpath="{.data.admin-password}" | base64 -d
+{{ end }}
+
+ENABLED COMPONENTS:
+{{- if index .Values "grafana-operator" "enabled" }}
+  ✓ Grafana Operator (manages Grafana instances via CRDs)
+{{- end }}
+{{- if .Values.grafana.instance.enabled }}
+  ✓ Grafana Instance
+{{- end }}
+{{- if .Values.loki.enabled }}
+  ✓ Loki (log aggregation)
+{{- end }}
+{{- if .Values.alloy.enabled }}
+  ✓ Alloy (telemetry collector)
+{{- end }}
+
+VICTORIAMETRICS ({{ .Values.victoriametrics.mode }} mode):
+{{- if eq .Values.victoriametrics.mode "single" }}
+  ✓ VictoriaMetrics Single
+    Write URL: {{ include "k8s-observability-stack.vmWriteUrl" . }}
+    Query URL: {{ include "k8s-observability-stack.vmQueryUrl" . }}
+{{- else }}
+  ✓ VictoriaMetrics Cluster
+    Write URL: {{ include "k8s-observability-stack.vmWriteUrl" . }}
+    Query URL: {{ include "k8s-observability-stack.vmQueryUrl" . }}
+{{- end }}
+
+{{- if .Values.vmalert.enabled }}
+  ✓ VMAlert (alerting engine)
+{{- end }}
+
+OPTIONAL COMPONENTS:
+{{- if index .Values "kube-state-metrics" "enabled" }}
+  ✓ kube-state-metrics
+{{- else }}
+  ○ kube-state-metrics (disabled)
+{{- end }}
+{{- if .Values.victoriatraces.enabled }}
+  ✓ VictoriaTraces ({{ .Values.victoriatraces.mode }} mode)
+{{- else }}
+  ○ VictoriaTraces (disabled)
+{{- end }}
+{{- if .Values.alertmanager.enabled }}
+  ✓ Alertmanager
+{{- else }}
+  ○ Alertmanager (disabled)
+{{- end }}
+{{- if .Values.jaeger.enabled }}
+  ✓ Jaeger
+{{- else }}
+  ○ Jaeger (disabled)
+{{- end }}
+{{- if .Values.kiali.enabled }}
+  ✓ Kiali
+{{- else }}
+  ○ Kiali (disabled)
+{{- end }}
+
+{{- if .Values.grafana.datasources.autoCreate }}
+
+AUTO-CONFIGURED DATASOURCES:
+  • VictoriaMetrics (Prometheus-compatible) - {{ include "k8s-observability-stack.vmQueryUrl" . }}
+  • Loki - {{ include "k8s-observability-stack.lokiUrl" . }}
+{{- if or .Values.victoriatraces.enabled .Values.jaeger.enabled }}
+  • Tracing - {{ include "k8s-observability-stack.tracingUrl" . }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.mixins.enabled }}
+
+DASHBOARDS & ALERTS:
+  Mixin-based dashboards and alert rules are enabled:
+{{- if .Values.mixins.kubernetes.enabled }}
+  • Kubernetes dashboards and alerts
+{{- end }}
+{{- if .Values.mixins.nodeExporter.enabled }}
+  • Node Exporter dashboards and alerts
+{{- end }}
+{{- if .Values.mixins.victoriametrics.enabled }}
+  • VictoriaMetrics dashboards and alerts
+{{- end }}
+{{- end }}
+
+USEFUL COMMANDS:
+  # Check all pods status
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+  # View logs
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }} -f
+
+  # Check Grafana operator status
+  kubectl get grafanas,grafanadatasources,grafanadashboards -n {{ .Release.Namespace }}
+
+DOCUMENTATION:
+  https://github.com/theorigamicorporation/k8s-observability-stack
+
+================================================================================

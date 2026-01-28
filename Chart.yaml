@@ -1,0 +1,130 @@
+apiVersion: v2
+name: k8s-observability-stack
+description: |
+  Complete Kubernetes observability stack with VictoriaMetrics, Loki, Grafana Operator, and more.
+  A modern replacement for kube-prometheus-stack and kube-victoriametrics-stack with support for
+  larger clusters, service mesh, and distributed tracing.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+kubeVersion: ">=1.25.0-0"
+home: https://github.com/theorigamicorporation/k8s-observability-stack
+icon: https://raw.githubusercontent.com/theorigamicorporation/k8s-observability-stack/main/docs/images/logo.png
+sources:
+  - https://github.com/theorigamicorporation/k8s-observability-stack
+maintainers:
+  - name: theorigamicorporation
+    url: https://github.com/theorigamicorporation
+keywords:
+  - observability
+  - monitoring
+  - metrics
+  - logs
+  - traces
+  - victoria-metrics
+  - loki
+  - grafana
+  - alertmanager
+  - jaeger
+  - kiali
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/theorigamicorporation/k8s-observability-stack/blob/main/README.md
+    - name: Chart Source
+      url: https://github.com/theorigamicorporation/k8s-observability-stack
+
+dependencies:
+  # =============================================================================
+  # Core Components - Always enabled by default
+  # =============================================================================
+  
+  # Grafana Operator - Manages Grafana instances, datasources, and dashboards via CRDs
+  # https://artifacthub.io/packages/helm/grafana/grafana-operator
+  - name: grafana-operator
+    version: "5.21.4"
+    repository: https://grafana.github.io/helm-charts
+    condition: grafana-operator.enabled
+  
+  # Loki - Log aggregation system
+  # https://artifacthub.io/packages/helm/grafana/loki
+  - name: loki
+    version: "6.51.0"
+    repository: https://grafana.github.io/helm-charts
+    condition: loki.enabled
+  
+  # Alloy - OpenTelemetry collector for metrics, logs, and traces
+  # https://artifacthub.io/packages/helm/grafana/alloy
+  - name: alloy
+    version: "1.5.2"
+    repository: https://grafana.github.io/helm-charts
+    condition: alloy.enabled
+
+  # =============================================================================
+  # VictoriaMetrics - Metrics storage (single or cluster mode)
+  # =============================================================================
+  
+  # VictoriaMetrics Single - For small to medium clusters
+  # https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single
+  - name: victoria-metrics-single
+    version: "0.29.0"
+    repository: https://victoriametrics.github.io/helm-charts
+    condition: victoriametrics.single.enabled
+    alias: vmsingle
+  
+  # VictoriaMetrics Cluster - For large clusters requiring horizontal scaling
+  # https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-cluster
+  - name: victoria-metrics-cluster
+    version: "0.32.0"
+    repository: https://victoriametrics.github.io/helm-charts
+    condition: victoriametrics.cluster.enabled
+    alias: vmcluster
+
+  # =============================================================================
+  # Optional Components - Disabled by default
+  # =============================================================================
+  
+  # kube-state-metrics - Kubernetes state metrics exporter
+  # https://artifacthub.io/packages/helm/bitnami/kube-state-metrics
+  - name: kube-state-metrics
+    version: "5.1.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: kube-state-metrics.enabled
+  
+  # VictoriaTraces Single - Distributed tracing backend (single mode)
+  # https://artifacthub.io/packages/helm/victoriametrics/victoria-traces-single
+  - name: victoria-traces-single
+    version: "0.0.6"
+    repository: https://victoriametrics.github.io/helm-charts
+    condition: victoriatraces.single.enabled
+    alias: vtsingle
+  
+  # VictoriaTraces Cluster - Distributed tracing backend (cluster mode)
+  # https://artifacthub.io/packages/helm/victoriametrics/victoria-traces-cluster
+  - name: victoria-traces-cluster
+    version: "0.0.6"
+    repository: https://victoriametrics.github.io/helm-charts
+    condition: victoriatraces.cluster.enabled
+    alias: vtcluster
+  
+  # Alertmanager - Alert routing and management
+  # https://artifacthub.io/packages/helm/prometheus-community/alertmanager
+  - name: alertmanager
+    version: "1.31.1"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: alertmanager.enabled
+  
+  # Jaeger - Distributed tracing (alternative to VictoriaTraces)
+  # https://artifacthub.io/packages/helm/jaegertracing/jaeger
+  - name: jaeger
+    version: "4.4.2"
+    repository: https://jaegertracing.github.io/helm-charts
+    condition: jaeger.enabled
+  
+  # Kiali - Service mesh observability dashboard
+  # https://artifacthub.io/packages/helm/kiali/kiali-server
+  - name: kiali-server
+    version: "2.21.0"
+    repository: https://kiali.org/helm-charts
+    condition: kiali.enabled

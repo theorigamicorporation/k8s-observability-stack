@@ -1,0 +1,124 @@
+{{/*
+This template handles the mode configuration for VictoriaMetrics.
+It sets up the correct values based on whether single or cluster mode is selected.
+
+Mode selection logic:
+- victoriametrics.mode = "single" -> enables victoria-metrics-single subchart
+- victoriametrics.mode = "cluster" -> enables victoria-metrics-cluster subchart
+
+The URLs and configurations are automatically adjusted based on the mode.
+*/}}
+
+{{/*
+ConfigMap containing mode-specific configuration that can be used by other components
+*/}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "k8s-observability-stack.fullname" . }}-vm-config
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: victoriametrics-config
+data:
+  # VictoriaMetrics mode (single or cluster)
+  VM_MODE: {{ .Values.victoriametrics.mode | quote }}
+  
+  # Write endpoint for metrics ingestion
+  VM_WRITE_URL: {{ include "k8s-observability-stack.vmWriteUrl" . | quote }}
+  
+  # Read/Query endpoint for metric queries
+  VM_QUERY_URL: {{ include "k8s-observability-stack.vmQueryUrl" . | quote }}
+  
+  # Retention period
+  {{- if eq .Values.victoriametrics.mode "cluster" }}
+  VM_RETENTION: {{ .Values.vmcluster.vmstorage.retentionPeriod | default "14d" | quote }}
+  {{- else }}
+  VM_RETENTION: {{ .Values.vmsingle.server.retentionPeriod | default "14d" | quote }}
+  {{- end }}
+
+{{/*
+VictoriaTraces mode configuration (if enabled)
+*/}}
+{{- if .Values.victoriatraces.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "k8s-observability-stack.fullname" . }}-vt-config
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: victoriatraces-config
+data:
+  # VictoriaTraces mode (single or cluster)
+  VT_MODE: {{ .Values.victoriatraces.mode | quote }}
+  
+  # VictoriaTraces endpoint
+  VT_URL: {{ include "k8s-observability-stack.vtUrl" . | quote }}
+  
+  # OTLP endpoint for traces
+  {{- if eq .Values.victoriatraces.mode "cluster" }}
+  VT_OTLP_ENDPOINT: "http://{{ include "k8s-observability-stack.fullname" . }}-vtcluster:4317"
+  {{- else }}
+  VT_OTLP_ENDPOINT: "http://{{ include "k8s-observability-stack.fullname" . }}-vtsingle-server:4317"
+  {{- end }}
+{{- end }}
+
+{{/*
+Service discovery configuration for internal components
+This helps other services find the correct endpoints
+*/}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "k8s-observability-stack.fullname" . }}-endpoints
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: service-discovery
+data:
+  # Metrics endpoints
+  METRICS_WRITE_URL: {{ include "k8s-observability-stack.vmWriteUrl" . | quote }}
+  METRICS_QUERY_URL: {{ include "k8s-observability-stack.vmQueryUrl" . | quote }}
+  
+  # Logs endpoint
+  LOGS_URL: {{ include "k8s-observability-stack.lokiUrl" . | quote }}
+  LOGS_PUSH_URL: "{{ include "k8s-observability-stack.lokiUrl" . }}/loki/api/v1/push"
+  
+  # Tracing endpoints
+  {{- if .Values.victoriatraces.enabled }}
+  TRACES_URL: {{ include "k8s-observability-stack.vtUrl" . | quote }}
+  TRACES_TYPE: "victoriatraces"
+  {{- else if .Values.jaeger.enabled }}
+  TRACES_URL: {{ include "k8s-observability-stack.jaegerUrl" . | quote }}
+  TRACES_TYPE: "jaeger"
+  {{- else }}
+  TRACES_URL: ""
+  TRACES_TYPE: "none"
+  {{- end }}
+  
+  # Alerting endpoints
+  {{- if .Values.alertmanager.enabled }}
+  ALERTMANAGER_URL: {{ include "k8s-observability-stack.alertmanagerUrl" . | quote }}
+  {{- else }}
+  ALERTMANAGER_URL: ""
+  {{- end }}
+  
+  {{- if .Values.vmalert.enabled }}
+  VMALERT_URL: "http://{{ include "k8s-observability-stack.vmalertName" . }}:8880"
+  {{- else }}
+  VMALERT_URL: ""
+  {{- end }}
+  
+  # Visualization
+  GRAFANA_URL: {{ include "k8s-observability-stack.grafanaUrl" . | quote }}
+  
+  # kube-state-metrics
+  {{- if index .Values "kube-state-metrics" "enabled" }}
+  KSM_URL: {{ include "k8s-observability-stack.ksmUrl" . | quote }}
+  {{- else }}
+  KSM_URL: ""
+  {{- end }}

@@ -1,0 +1,295 @@
+{{- if and (index .Values "grafana-operator" "enabled") .Values.grafana.instance.enabled .Values.grafana.dashboards.enabled }}
+{{/*
+Dashboard Folders for organization
+*/}}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-folder
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  title: Kubernetes
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: {{ include "k8s-observability-stack.fullname" . }}-victoriametrics
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-folder
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  title: VictoriaMetrics
+
+{{/*
+=============================================================================
+Dashboards from Grafana.com
+These reference community-maintained dashboards by ID, ensuring they stay
+up-to-date without hardcoding JSON in the chart.
+=============================================================================
+*/}}
+
+{{/*
+Kubernetes Dashboards from Grafana.com
+*/}}
+{{- if .Values.grafana.dashboards.providers.kubernetes.enabled }}
+---
+# Kubernetes / Views / Global
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-k8s-global
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  grafanaCom:
+    id: 15757  # Kubernetes / Views / Global
+    revision: 42
+---
+# Kubernetes / Views / Namespaces
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-k8s-namespaces
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  grafanaCom:
+    id: 15758  # Kubernetes / Views / Namespaces
+    revision: 39
+---
+# Kubernetes / Views / Nodes
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-k8s-nodes
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  grafanaCom:
+    id: 15759  # Kubernetes / Views / Nodes
+    revision: 32
+---
+# Kubernetes / Views / Pods
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-k8s-pods
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  grafanaCom:
+    id: 15760  # Kubernetes / Views / Pods
+    revision: 30
+{{- end }}
+
+{{/*
+Node Exporter Dashboard
+*/}}
+{{- if .Values.grafana.dashboards.providers.nodeExporter.enabled }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-node-exporter
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: node-exporter
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  grafanaCom:
+    id: 1860  # Node Exporter Full
+    revision: 37
+{{- end }}
+
+{{/*
+VictoriaMetrics Dashboards (from official repo URLs)
+*/}}
+{{- if .Values.grafana.dashboards.providers.victoriametrics.enabled }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-victoriametrics
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: victoriametrics
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-victoriametrics
+  url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/victoriametrics.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-vmagent
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: victoriametrics
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-victoriametrics
+  url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmagent.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-vmalert
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: victoriametrics
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-victoriametrics
+  url: https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/dashboards/vmalert.json
+{{- end }}
+
+{{/*
+Loki Dashboard
+*/}}
+{{- if and .Values.loki.enabled .Values.grafana.dashboards.providers.loki.enabled }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-loki
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: loki
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  grafanaCom:
+    id: 13639  # Loki Dashboard
+    revision: 2
+{{- end }}
+
+{{/*
+Alloy Dashboard
+*/}}
+{{- if and .Values.alloy.enabled .Values.grafana.dashboards.providers.alloy.enabled }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-alloy
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: alloy
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  grafanaCom:
+    id: 22785  # Grafana Alloy / Grafana Operator
+    revision: 1
+{{- end }}
+
+{{/*
+=============================================================================
+Additional Custom Dashboards from values
+=============================================================================
+*/}}
+{{- range .Values.grafana.dashboards.additional }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" $ }}-{{ .name | lower | replace " " "-" | trunc 50 }}
+  namespace: {{ include "k8s-observability-stack.namespace" $ }}
+  labels:
+    {{- include "k8s-observability-stack.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" $ }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+  {{- if .folder }}
+  folder: {{ .folder }}
+  {{- end }}
+  {{- if .url }}
+  url: {{ .url }}
+  {{- else if .grafanaComId }}
+  grafanaCom:
+    id: {{ .grafanaComId }}
+    revision: {{ .grafanaComRevision | default 1 }}
+  {{- else if .configMapRef }}
+  configMapRef:
+    name: {{ .configMapRef.name }}
+    key: {{ .configMapRef.key | default "dashboard.json" }}
+  {{- end }}
+{{- end }}
+{{- end }}

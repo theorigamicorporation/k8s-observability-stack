@@ -1,0 +1,23 @@
+# =============================================================================
+# CODEOWNERS for k8s-observability-stack
+# =============================================================================
+# These owners will be requested for review when someone opens a pull request.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything
+* @theorigamicorporation
+
+# Chart configuration
+Chart.yaml @theorigamicorporation
+values.yaml @theorigamicorporation
+
+# Templates require careful review
+templates/ @theorigamicorporation
+
+# CI/CD configuration
+.github/ @theorigamicorporation
+
+# Documentation
+README.md @theorigamicorporation
+CONTRIBUTING.md @theorigamicorporation
+docs/ @theorigamicorporation

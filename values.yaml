@@ -1,0 +1,973 @@
+# =============================================================================
+# K8s Observability Stack - Values Configuration
+# =============================================================================
+# This file contains all configuration options for the observability stack.
+# All subchart values are exposed and can be customized under their respective keys.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Global Settings
+# -----------------------------------------------------------------------------
+global:
+  # Cluster name used for labeling and identification
+  clusterName: ""
+  
+  # Default storage class for all persistent volumes
+  storageClass: ""
+  
+  # Common labels applied to all resources
+  commonLabels: {}
+  
+  # Common annotations applied to all resources
+  commonAnnotations: {}
+  
+  # Image pull secrets for private registries
+  imagePullSecrets: []
+  
+  # Priority class name for all pods
+  priorityClassName: ""
+
+# -----------------------------------------------------------------------------
+# Grafana Operator Configuration
+# -----------------------------------------------------------------------------
+# Manages Grafana instances, datasources, and dashboards via Kubernetes CRDs
+grafana-operator:
+  enabled: true
+  # All grafana-operator chart values can be configured here
+  # See: https://github.com/grafana/grafana-operator/tree/master/deploy/helm
+
+# Grafana Instance Configuration (managed by our templates)
+grafana:
+  # Enable Grafana instance creation via operator CRD
+  instance:
+    enabled: true
+    
+    # Grafana version
+    version: "11.0.0"
+    
+    # Number of replicas
+    replicas: 1
+    
+    # Resource requests and limits
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    
+    # Persistence configuration
+    persistence:
+      enabled: false
+      size: 10Gi
+      storageClass: ""
+    
+    # Ingress configuration
+    ingress:
+      enabled: false
+      ingressClassName: ""
+      annotations: {}
+      hosts:
+        - grafana.local
+      tls: []
+    
+    # Admin credentials configuration
+    # For production, use existingSecret to reference an externally managed secret
+    adminCredentials:
+      # Name of existing secret containing admin credentials
+      # If set, no secret will be created by this chart
+      # The secret must contain 'admin-user', 'admin-password', and 'ADMIN_PASSWORD' keys
+      existingSecret: ""
+      
+      # Username for admin user (only used when existingSecret is empty)
+      username: admin
+      
+      # Password for admin user (only used when existingSecret is empty)
+      # If empty, a random 16-character password is generated
+      password: ""
+    
+    # Additional secrets to mount in the Grafana pod
+    # Useful for datasource credentials, OAuth secrets, etc.
+    additionalSecrets: []
+    # - my-oauth-secret
+    # - my-datasource-credentials
+    
+    # Additional environment variables
+    env: []
+    
+    # Additional volumes and volume mounts
+    volumes: []
+    volumeMounts: []
+    
+    # Node selector
+    nodeSelector: {}
+    
+    # Tolerations
+    tolerations: []
+    
+    # Affinity rules
+    affinity: {}
+    
+    # Security context
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 472
+      fsGroup: 472
+
+  # Datasources auto-configuration
+  datasources:
+    # Automatically create datasources for all enabled backends
+    autoCreate: true
+    
+    # VictoriaMetrics/Prometheus datasource
+    victoriametrics:
+      enabled: true
+      isDefault: true
+      # Custom URL override (auto-detected if empty)
+      url: ""
+    
+    # Loki datasource
+    loki:
+      enabled: true
+      # Custom URL override (auto-detected if empty)
+      url: ""
+    
+    # Tracing datasource (VictoriaTraces or Jaeger)
+    tracing:
+      enabled: true
+      # Custom URL override (auto-detected if empty)
+      url: ""
+    
+    # Additional custom datasources
+    additional: []
+    # - name: external-prometheus
+    #   type: prometheus
+    #   url: http://external-prometheus:9090
+    #   access: proxy
+    #   isDefault: false
+
+  # Dashboard configuration
+  dashboards:
+    # Enable dashboards
+    enabled: true
+    
+    # Dashboard providers
+    # Dashboards are fetched from Grafana.com or official URLs to stay up-to-date
+    # No hardcoded JSON - dashboards update automatically
+    providers:
+      # Kubernetes dashboards (from grafana.com community dashboards)
+      kubernetes:
+        enabled: true
+      
+      # Node exporter dashboards
+      nodeExporter:
+        enabled: true
+      
+      # VictoriaMetrics dashboards (from official VM repo)
+      victoriametrics:
+        enabled: true
+      
+      # Loki dashboards
+      loki:
+        enabled: true
+      
+      # Alloy/Grafana Agent dashboards
+      alloy:
+        enabled: true
+    
+    # Additional custom dashboards
+    # Supports: grafanaComId, url, or configMapRef
+    additional: []
+    # Example configurations:
+    # - name: my-custom-dashboard
+    #   grafanaComId: 12345
+    #   grafanaComRevision: 1
+    #   folder: my-folder
+    # - name: dashboard-from-url
+    #   url: https://example.com/dashboard.json
+    # - name: dashboard-from-configmap
+    #   configMapRef:
+    #     name: my-dashboard-configmap
+    #     key: dashboard.json
+
+# -----------------------------------------------------------------------------
+# Loki Configuration
+# -----------------------------------------------------------------------------
+# Log aggregation system
+loki:
+  enabled: true
+  
+  # Deploy mode options:
+  # - SingleBinary: All-in-one deployment (default, for small installs)
+  # - SimpleScalable: read/write/backend targets (medium installs, up to 1TB/day)
+  # - Distributed: Full microservices (large installs, 1TB+/day)
+  deploymentMode: SingleBinary
+  
+  # All loki chart values can be configured here
+  # See: https://artifacthub.io/packages/helm/grafana/loki
+  
+  loki:
+    # Authentication disabled for internal use
+    auth_enabled: false
+    
+    # Common config
+    commonConfig:
+      replication_factor: 1
+    
+    # Schema config
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+    
+    # Storage config
+    storage:
+      type: filesystem
+    
+    # Limits config - important for production
+    limits_config:
+      # Retention period (requires compactor)
+      retention_period: 168h  # 7 days
+      
+      # Ingestion limits
+      ingestion_rate_mb: 10
+      ingestion_burst_size_mb: 20
+      max_streams_per_user: 10000
+      max_line_size: 256kb
+      
+      # Query limits
+      max_entries_limit_per_query: 5000
+      max_query_series: 500
+      max_query_parallelism: 32
+    
+    # Compactor (required for retention)
+    compactor:
+      working_directory: /var/loki/compactor
+      compaction_interval: 10m
+      retention_enabled: true
+      retention_delete_delay: 2h
+      retention_delete_worker_count: 150
+  
+  # Single binary mode settings (for SingleBinary deploymentMode)
+  singleBinary:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+  
+  # Disable components not needed in single-binary mode
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  
+  # Gateway (enable for SimpleScalable/Distributed modes)
+  gateway:
+    enabled: false
+  
+  # Disable chunksCache, resultsCache for simple deployments
+  chunksCache:
+    enabled: false
+  resultsCache:
+    enabled: false
+  
+  # Disable test pod
+  test:
+    enabled: false
+
+# -----------------------------------------------------------------------------
+# Alloy Configuration
+# -----------------------------------------------------------------------------
+# OpenTelemetry-compatible collector for metrics, logs, and traces
+alloy:
+  enabled: true
+  
+  # All alloy chart values can be configured here
+  # See: https://artifacthub.io/packages/helm/grafana/alloy
+  
+  alloy:
+    # ConfigMap handling
+    # We create our own configmap (templates/connections/alloy-config.yaml) with 
+    # full pipeline configuration for metrics, logs, and traces
+    configMap:
+      create: false  # Disable subchart configmap, we provide our own
+      name: null
+      key: null
+    
+    # Extra ports to expose (OTLP, etc.)
+    extraPorts:
+      - name: otlp-grpc
+        port: 4317
+        targetPort: 4317
+        protocol: TCP
+      - name: otlp-http
+        port: 4318
+        targetPort: 4318
+        protocol: TCP
+    
+    # Clustering for high availability (useful with StatefulSet)
+    clustering:
+      enabled: false
+    
+    # Stability level: experimental, public-preview, or generally-available
+    stabilityLevel: generally-available
+    
+    # Mounts for log collection
+    mounts:
+      varlog: true
+      dockercontainers: false
+    
+    # Resource requirements
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  
+  # Controller configuration
+  controller:
+    # Type: daemonset (for node-level collection), deployment, or statefulset
+    type: daemonset
+    replicas: 1
+    
+    # Node selector (useful for excluding certain nodes)
+    nodeSelector: {}
+    
+    # Tolerations (to run on all nodes including masters)
+    tolerations:
+      - operator: Exists
+  
+  # Service account
+  serviceAccount:
+    create: true
+  
+  # RBAC rules (required for Kubernetes discovery)
+  rbac:
+    create: true
+
+# -----------------------------------------------------------------------------
+# VictoriaMetrics Configuration
+# -----------------------------------------------------------------------------
+# Time-series database for metrics storage
+victoriametrics:
+  # Deployment mode: "single" or "cluster"
+  # - single: All-in-one deployment, suitable for small to medium clusters
+  # - cluster: Distributed deployment with horizontal scaling
+  mode: "single"
+  
+  # Single mode configuration
+  single:
+    # Computed from mode, do not set manually
+    enabled: true
+    
+  # Cluster mode configuration  
+  cluster:
+    # Computed from mode, do not set manually
+    enabled: false
+
+# VictoriaMetrics Single configuration
+# All victoria-metrics-single chart values
+# See: https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single
+vmsingle:
+  server:
+    # Resource requirements
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 1
+        memory: 2Gi
+    
+    # Persistence
+    persistentVolume:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+    
+    # Retention period
+    retentionPeriod: 14d
+    
+    # Extra args
+    extraArgs:
+      dedup.minScrapeInterval: 30s
+    
+    # Scrape configuration
+    scrape:
+      enabled: true
+      configMap: ""
+  
+  # Disable alertmanager in subchart (we use standalone)
+  alertmanager:
+    enabled: false
+
+# VictoriaMetrics Cluster configuration
+# All victoria-metrics-cluster chart values
+# See: https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-cluster
+vmcluster:
+  # VMSelect - Query component
+  vmselect:
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    extraArgs:
+      dedup.minScrapeInterval: 30s
+  
+  # VMInsert - Write component
+  vminsert:
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  
+  # VMStorage - Storage component
+  vmstorage:
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 2Gi
+    persistentVolume:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+    retentionPeriod: 14d
+
+# -----------------------------------------------------------------------------
+# VMAlert Configuration (for alerting with VictoriaMetrics)
+# -----------------------------------------------------------------------------
+vmalert:
+  enabled: true
+  
+  # Resource requirements
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  
+  # Extra args
+  extraArgs: {}
+  
+  # Replicas
+  replicas: 1
+
+# -----------------------------------------------------------------------------
+# kube-state-metrics Configuration (Optional)
+# -----------------------------------------------------------------------------
+# Kubernetes state metrics exporter
+kube-state-metrics:
+  enabled: false
+  
+  # All kube-state-metrics chart values can be configured here
+  # See: https://artifacthub.io/packages/helm/bitnami/kube-state-metrics
+  
+  # Resource requirements
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  
+  # Collectors to enable
+  collectors:
+    - certificatesigningrequests
+    - configmaps
+    - cronjobs
+    - daemonsets
+    - deployments
+    - endpoints
+    - horizontalpodautoscalers
+    - ingresses
+    - jobs
+    - leases
+    - limitranges
+    - namespaces
+    - networkpolicies
+    - nodes
+    - persistentvolumeclaims
+    - persistentvolumes
+    - poddisruptionbudgets
+    - pods
+    - replicasets
+    - replicationcontrollers
+    - resourcequotas
+    - secrets
+    - services
+    - statefulsets
+    - storageclasses
+    - validatingwebhookconfigurations
+    - volumeattachments
+
+# -----------------------------------------------------------------------------
+# VictoriaTraces Configuration (Optional)
+# -----------------------------------------------------------------------------
+# Distributed tracing backend
+victoriatraces:
+  # Enable VictoriaTraces
+  enabled: false
+  
+  # Deployment mode: "single" or "cluster"
+  mode: "single"
+  
+  # Single mode configuration
+  single:
+    # Computed from mode and enabled state
+    enabled: false
+    
+  # Cluster mode configuration
+  cluster:
+    # Computed from mode and enabled state
+    enabled: false
+
+# VictoriaTraces Single configuration
+# All victoria-traces-single chart values
+# See: https://artifacthub.io/packages/helm/victoriametrics/victoria-traces-single
+vtsingle:
+  server:
+    # Retention period for traces (default 1 month)
+    # Possible units: h(ours), d(ays), w(eeks), y(ears)
+    retentionPeriod: 7d
+    
+    # Resources
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    
+    # Persistence
+    persistentVolume:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+    
+    # Extra args
+    extraArgs:
+      envflag.enable: true
+      envflag.prefix: VM_
+      loggerFormat: json
+      httpListenAddr: ":10428"
+
+# VictoriaTraces Cluster configuration
+# All victoria-traces-cluster chart values
+# See: https://artifacthub.io/packages/helm/victoriametrics/victoria-traces-cluster
+vtcluster:
+  # VTSelect - Query component for traces
+  vtselect:
+    enabled: true
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    extraArgs:
+      envflag.enable: true
+      loggerFormat: json
+      httpListenAddr: ":10471"
+  
+  # VTInsert - Write component for traces
+  vtinsert:
+    enabled: true
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    extraArgs:
+      envflag.enable: true
+      loggerFormat: json
+      httpListenAddr: ":10480"
+  
+  # VTStorage - Storage component for traces
+  vtstorage:
+    enabled: true
+    replicaCount: 2
+    # Retention period for traces
+    retentionPeriod: 7d
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 2Gi
+    persistentVolume:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+    extraArgs:
+      envflag.enable: true
+      loggerFormat: json
+
+# -----------------------------------------------------------------------------
+# Alertmanager Configuration (Optional)
+# -----------------------------------------------------------------------------
+# Alert routing and notification management
+alertmanager:
+  enabled: false
+  
+  # All alertmanager chart values can be configured here
+  # See: https://artifacthub.io/packages/helm/prometheus-community/alertmanager
+  
+  # Resource requirements
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  
+  # Persistence
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+  
+  # Alertmanager configuration
+  config:
+    global:
+      resolve_timeout: 5m
+    
+    route:
+      group_by: ['alertname', 'namespace']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'null'
+      routes: []
+    
+    receivers:
+      - name: 'null'
+    
+    inhibit_rules:
+      - source_matchers:
+          - severity = critical
+        target_matchers:
+          - severity =~ warning|info
+        equal:
+          - namespace
+          - alertname
+      - source_matchers:
+          - severity = warning
+        target_matchers:
+          - severity = info
+        equal:
+          - namespace
+          - alertname
+
+# -----------------------------------------------------------------------------
+# Jaeger Configuration (Optional)
+# -----------------------------------------------------------------------------
+# Distributed tracing system (alternative to VictoriaTraces)
+# Note: Jaeger v4.x uses unified deployment model (All-In-One architecture)
+jaeger:
+  enabled: false
+  
+  # All jaeger chart values can be configured here
+  # See: https://artifacthub.io/packages/helm/jaegertracing/jaeger
+  
+  # Jaeger v2 All-In-One deployment
+  jaeger:
+    enabled: true
+    replicas: 1
+    image:
+      repository: jaegertracing/jaeger
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    ingress:
+      enabled: false
+  
+  # Storage configuration
+  # For production, configure elasticsearch or cassandra in userconfig
+  storage:
+    type: elasticsearch  # elasticsearch or cassandra
+    elasticsearch:
+      url: http://elasticsearch-master:9200
+      # user: elastic
+      # password: changeme
+  
+  # User config for Jaeger v2 (OpenTelemetry Collector format)
+  # See: https://github.com/jaegertracing/jaeger/tree/main/cmd/jaeger
+  userconfig: {}
+  # Example for in-memory storage:
+  #   extensions:
+  #     jaeger_storage:
+  #       backends:
+  #         memory_store:
+  #           memory:
+  #             max_traces: 100000
+
+# -----------------------------------------------------------------------------
+# Kiali Configuration (Optional)
+# -----------------------------------------------------------------------------
+# Service mesh observability dashboard (for Istio)
+kiali:
+  enabled: false
+  
+  # All kiali-server chart values can be configured here
+  # See: https://artifacthub.io/packages/helm/kiali/kiali-server
+  
+  # Auth strategy: anonymous, token, openid, openshift, header
+  auth:
+    strategy: anonymous  # Use openid or token for production
+  
+  # Deployment settings
+  deployment:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 1Gi
+    ingress:
+      # enabled: true  # Uncomment to enable ingress
+      class_name: nginx
+    # Cluster-wide access to monitor all namespaces
+    cluster_wide_access: true
+  
+  # External services configuration
+  external_services:
+    prometheus:
+      url: ""  # Auto-configured to VictoriaMetrics
+    grafana:
+      enabled: true
+      url: ""  # Auto-configured
+    tracing:
+      enabled: false
+      url: ""  # Auto-configured when tracing is enabled
+    istio:
+      root_namespace: istio-system
+  
+  # Server settings
+  server:
+    port: 20001
+    observability:
+      metrics:
+        enabled: true
+        port: 9090
+
+# -----------------------------------------------------------------------------
+# Mixins Configuration
+# -----------------------------------------------------------------------------
+# Dashboard and alert rule generation from community mixins
+mixins:
+  # Enable mixin-based dashboards and alerts
+  enabled: true
+  
+  # Kubernetes mixin (kubernetes-mixin)
+  kubernetes:
+    enabled: true
+    # Include dashboards
+    dashboards: true
+    # Include alert rules
+    alerts: true
+  
+  # Node exporter mixin
+  nodeExporter:
+    enabled: true
+    dashboards: true
+    alerts: true
+  
+  # VictoriaMetrics specific rules
+  victoriametrics:
+    enabled: true
+    dashboards: true
+    alerts: true
+  
+  # Alert rules configuration
+  alerts:
+    # Enable alert rules
+    enabled: true
+    
+    # Labels to add to all alert rules
+    additionalLabels: {}
+    
+    # Annotations to add to all alert rules
+    additionalAnnotations: {}
+    
+    # Rules to disable (by alert name)
+    disabled: []
+    # - KubeMemoryOvercommit
+    # - KubeCPUOvercommit
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor Configuration
+# -----------------------------------------------------------------------------
+# Prometheus/VictoriaMetrics ServiceMonitor resources
+serviceMonitor:
+  # Enable ServiceMonitor creation
+  enabled: true
+  
+  # Namespace selector for ServiceMonitor
+  namespaceSelector: {}
+  
+  # Additional labels for ServiceMonitor
+  additionalLabels: {}
+  
+  # Scrape interval
+  interval: 30s
+  
+  # Scrape timeout
+  scrapeTimeout: 10s
+  
+  # Honor labels
+  honorLabels: true
+  
+  # Relabeling configs
+  relabelings: []
+  
+  # Metric relabeling configs
+  metricRelabelings: []
+
+# -----------------------------------------------------------------------------
+# Network Policies
+# -----------------------------------------------------------------------------
+networkPolicy:
+  # Enable network policies
+  enabled: false
+  
+  # Allow ingress from specific namespaces
+  ingressNamespaces: []
+  
+  # Allow egress to specific namespaces
+  egressNamespaces: []
+
+# -----------------------------------------------------------------------------
+# Pod Security
+# -----------------------------------------------------------------------------
+podSecurityPolicy:
+  # Enable PSP (deprecated in k8s 1.25+)
+  enabled: false
+
+# Pod Security Standards
+podSecurityStandards:
+  # Enforce restricted pod security standards
+  enforce: restricted
+
+# =============================================================================
+# Subchart Values Reference
+# =============================================================================
+# All subchart values are exposed and can be customized. Below is a reference
+# for each subchart's values. For the complete list, see each chart's values.yaml
+# or documentation at the links in Chart.yaml.
+#
+# IMPORTANT: Subchart values use their chart name or alias as the key:
+#   - grafana-operator: index with "grafana-operator"
+#   - loki: index with "loki"
+#   - alloy: index with "alloy"
+#   - vmsingle: VictoriaMetrics single (alias)
+#   - vmcluster: VictoriaMetrics cluster (alias)
+#   - kube-state-metrics: index with "kube-state-metrics"
+#   - vtsingle: VictoriaTraces single (alias)
+#   - vtcluster: VictoriaTraces cluster (alias)
+#   - alertmanager: index with "alertmanager"
+#   - jaeger: index with "jaeger"
+#   - kiali: index with "kiali" (maps to kiali-server)
+#
+# Example: To customize Loki's retention:
+#   loki:
+#     loki:
+#       limits_config:
+#         retention_period: 30d
+#
+# Example: To customize VictoriaMetrics single:
+#   vmsingle:
+#     server:
+#       retentionPeriod: 30d
+#       persistentVolume:
+#         size: 100Gi
+#
+# =============================================================================
+# External Secrets Support
+# =============================================================================
+# For production deployments, you should use external secret management:
+#
+# 1. Grafana admin credentials:
+#    grafana:
+#      instance:
+#        adminCredentials:
+#          existingSecret: "my-grafana-admin-secret"
+#
+# 2. Alertmanager configuration:
+#    alertmanager:
+#      configmapReload:
+#        enabled: true
+#      config:
+#        # Your alertmanager config - or use existingSecret
+#
+# 3. Custom datasource credentials:
+#    grafana:
+#      instance:
+#        additionalSecrets:
+#          - my-datasource-credentials
+#
+# =============================================================================
+# Mixin Updates
+# =============================================================================
+# Dashboards and alert rules are sourced from:
+# 1. Grafana.com community dashboards (fetched by ID, always up-to-date)
+# 2. Official project URLs (VictoriaMetrics dashboards)
+# 3. Generated from mixins (optional, for custom rules)
+#
+# To update mixin-generated content:
+#   make sync-mixins
+#
+# This will:
+# 1. Update jsonnet dependencies (kubernetes-mixin, node-mixin)
+# 2. Regenerate alert/recording rules
+# 3. Place generated templates in templates/rules/
+#
+# For CI/CD, the update-deps.yaml workflow can optionally update mixins
+# by setting update_mixins: true in the workflow dispatch.
+# =============================================================================
