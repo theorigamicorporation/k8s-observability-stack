@@ -10,7 +10,7 @@ entries:
           url: https://github.com/theorigamicorporation/k8s-observability-stack
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-01-28T17:25:59.103632472Z"
+    created: "2026-01-28T17:46:14.410792601Z"
     dependencies:
     - condition: grafana-operator.enabled
       name: grafana-operator
@@ -64,7 +64,7 @@ entries:
       Grafana Operator, and more. A modern replacement for kube-prometheus-stack and
       kube-victoriametrics-stack with support for larger clusters, service mesh, and
       distributed tracing. '
-    digest: 7fa1e13766c4d088758c40efac926d4dbf257c729f2466541108bb3efadef91f
+    digest: c91aac16c7f526b867d9ac0ddb976f51df566e89acfc3793448bd88f340fa7d4
     home: https://github.com/theorigamicorporation/k8s-observability-stack
     icon: https://raw.githubusercontent.com/theorigamicorporation/k8s-observability-stack/main/docs/images/logo.png
     keywords:
@@ -90,4 +90,4 @@ entries:
     urls:
     - https://theorigamicorporation.github.io/k8s-observability-stack/k8s-observability-stack-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-28T17:25:59.065232985Z"
+generated: "2026-01-28T17:46:14.366567606Z"
