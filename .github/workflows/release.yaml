@@ -140,6 +140,9 @@ jobs:
       - name: Create gh-pages branch if not exists
         if: steps.checkout-gh-pages.outcome == 'failure'
         run: |
+          # Remove any partial checkout
+          rm -rf gh-pages
+          
           # Create orphan gh-pages branch
           git clone --depth 1 https://github.com/${{ github.repository }}.git gh-pages-temp
           cd gh-pages-temp
@@ -153,6 +156,7 @@ jobs:
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
           cd ..
           rm -rf gh-pages-temp
+          
           # Now checkout the newly created branch
           git clone --branch gh-pages --depth 1 https://github.com/${{ github.repository }}.git gh-pages
 
