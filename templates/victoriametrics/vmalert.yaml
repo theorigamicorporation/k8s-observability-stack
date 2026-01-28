@@ -145,7 +145,7 @@ spec:
         {{- include "k8s-observability-stack.labels" . | nindent 8 }}
         app.kubernetes.io/component: vmalert
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/victoriametrics/vmalert.yaml") . | sha256sum }}
+        checksum/config: {{ .Values.vmalert | toYaml | sha256sum }}
     spec:
       {{- with .Values.global.imagePullSecrets }}
       imagePullSecrets:
