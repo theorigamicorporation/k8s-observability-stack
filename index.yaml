@@ -1,0 +1,93 @@
+apiVersion: v1
+entries:
+  k8s-observability-stack:
+  - annotations:
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://github.com/theorigamicorporation/k8s-observability-stack/blob/main/README.md
+        - name: Chart Source
+          url: https://github.com/theorigamicorporation/k8s-observability-stack
+    apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-01-28T16:33:11.990529741Z"
+    dependencies:
+    - condition: grafana-operator.enabled
+      name: grafana-operator
+      repository: https://grafana.github.io/helm-charts
+      version: 5.21.4
+    - condition: loki.enabled
+      name: loki
+      repository: https://grafana.github.io/helm-charts
+      version: 6.51.0
+    - condition: alloy.enabled
+      name: alloy
+      repository: https://grafana.github.io/helm-charts
+      version: 1.5.2
+    - alias: vmsingle
+      condition: victoriametrics.single.enabled
+      name: victoria-metrics-single
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.29.0
+    - alias: vmcluster
+      condition: victoriametrics.cluster.enabled
+      name: victoria-metrics-cluster
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.32.0
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://charts.bitnami.com/bitnami
+      version: 5.1.0
+    - alias: vtsingle
+      condition: victoriatraces.single.enabled
+      name: victoria-traces-single
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.6
+    - alias: vtcluster
+      condition: victoriatraces.cluster.enabled
+      name: victoria-traces-cluster
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.0.6
+    - condition: alertmanager.enabled
+      name: alertmanager
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 1.31.1
+    - condition: jaeger.enabled
+      name: jaeger
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 4.4.2
+    - condition: kiali.enabled
+      name: kiali-server
+      repository: https://kiali.org/helm-charts
+      version: 2.21.0
+    description: 'Complete Kubernetes observability stack with VictoriaMetrics, Loki,
+      Grafana Operator, and more. A modern replacement for kube-prometheus-stack and
+      kube-victoriametrics-stack with support for larger clusters, service mesh, and
+      distributed tracing. '
+    digest: 59fc635abda3538bf8b220d8f0a07c1d8f8474f0dfddf22552238fb3c5e1c348
+    home: https://github.com/theorigamicorporation/k8s-observability-stack
+    icon: https://raw.githubusercontent.com/theorigamicorporation/k8s-observability-stack/main/docs/images/logo.png
+    keywords:
+    - observability
+    - monitoring
+    - metrics
+    - logs
+    - traces
+    - victoria-metrics
+    - loki
+    - grafana
+    - alertmanager
+    - jaeger
+    - kiali
+    kubeVersion: '>=1.25.0-0'
+    maintainers:
+    - name: theorigamicorporation
+      url: https://github.com/theorigamicorporation
+    name: k8s-observability-stack
+    sources:
+    - https://github.com/theorigamicorporation/k8s-observability-stack
+    type: application
+    urls:
+    - https://theorigamicorporation.github.io/k8s-observability-stack/k8s-observability-stack-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-01-28T16:33:11.950964682Z"
