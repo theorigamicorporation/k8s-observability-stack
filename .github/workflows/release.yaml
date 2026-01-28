@@ -130,6 +130,7 @@ jobs:
           generate_release_notes: true
 
       - name: Checkout gh-pages branch
+        id: checkout-gh-pages
         uses: actions/checkout@v4
         with:
           ref: gh-pages
@@ -137,13 +138,23 @@ jobs:
         continue-on-error: true
 
       - name: Create gh-pages branch if not exists
+        if: steps.checkout-gh-pages.outcome == 'failure'
         run: |
-          if [ ! -d "gh-pages" ]; then
-            mkdir gh-pages
-            cd gh-pages
-            git init
-            git checkout -b gh-pages
-          fi
+          # Create orphan gh-pages branch
+          git clone --depth 1 https://github.com/${{ github.repository }}.git gh-pages-temp
+          cd gh-pages-temp
+          git checkout --orphan gh-pages
+          git rm -rf .
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          echo "# Helm Chart Repository" > README.md
+          git add README.md
+          git commit -m "Initialize gh-pages branch"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
+          cd ..
+          rm -rf gh-pages-temp
+          # Now checkout the newly created branch
+          git clone --branch gh-pages --depth 1 https://github.com/${{ github.repository }}.git gh-pages
 
       - name: Update Helm repository index
         run: |
@@ -160,33 +171,33 @@ jobs:
           
           # Create a simple index.html
           cat > index.html << 'EOF'
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>k8s-observability-stack Helm Repository</title>
-            <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-              h1 { color: #333; }
-              pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
-              a { color: #0366d6; }
-            </style>
-          </head>
-          <body>
-            <h1>k8s-observability-stack Helm Repository</h1>
-            <p>Complete Kubernetes observability stack with VictoriaMetrics, Loki, Grafana, and more.</p>
-            
-            <h2>Quick Start</h2>
-            <pre>
-          helm repo add k8s-observability https://theorigamicorporation.github.io/k8s-observability-stack
-          helm repo update
-          helm install observability k8s-observability/k8s-observability-stack
-            </pre>
-            
-            <h2>Documentation</h2>
-            <p>See the <a href="https://github.com/theorigamicorporation/k8s-observability-stack">GitHub repository</a> for full documentation.</p>
-          </body>
-          </html>
-          EOF
+<!DOCTYPE html>
+<html>
+<head>
+  <title>k8s-observability-stack Helm Repository</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 { color: #333; }
+    pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    a { color: #0366d6; }
+  </style>
+</head>
+<body>
+  <h1>k8s-observability-stack Helm Repository</h1>
+  <p>Complete Kubernetes observability stack with VictoriaMetrics, Loki, Grafana, and more.</p>
+  
+  <h2>Quick Start</h2>
+  <pre>
+helm repo add k8s-observability https://theorigamicorporation.github.io/k8s-observability-stack
+helm repo update
+helm install observability k8s-observability/k8s-observability-stack
+  </pre>
+  
+  <h2>Documentation</h2>
+  <p>See the <a href="https://github.com/theorigamicorporation/k8s-observability-stack">GitHub repository</a> for full documentation.</p>
+</body>
+</html>
+EOF
 
       - name: Push to gh-pages
         run: |
@@ -194,10 +205,8 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add .
-          git commit -m "Release k8s-observability-stack v${{ steps.version.outputs.version }}" || echo "No changes to commit"
-          git push origin gh-pages --force
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git diff --staged --quiet || git commit -m "Release k8s-observability-stack v${{ steps.version.outputs.version }}"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
 
   notify:
     name: Notify Release
