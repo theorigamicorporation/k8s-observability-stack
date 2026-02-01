@@ -118,7 +118,7 @@ dependencies:
   # Jaeger - Distributed tracing (alternative to VictoriaTraces)
   # https://artifacthub.io/packages/helm/jaegertracing/jaeger
   - name: jaeger
-    version: "4.4.3"
+    version: "4.4.5"
     repository: https://jaegertracing.github.io/helm-charts
     condition: jaeger.enabled
   
