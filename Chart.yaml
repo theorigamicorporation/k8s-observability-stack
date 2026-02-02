@@ -111,7 +111,7 @@ dependencies:
   # Alertmanager - Alert routing and management
   # https://artifacthub.io/packages/helm/prometheus-community/alertmanager
   - name: alertmanager
-    version: "1.31.3"
+    version: "1.32.0"
     repository: https://prometheus-community.github.io/helm-charts
     condition: alertmanager.enabled
   
