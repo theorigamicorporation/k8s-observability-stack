@@ -847,7 +847,7 @@ mixins:
 # Prometheus/VictoriaMetrics ServiceMonitor resources
 serviceMonitor:
   # Enable ServiceMonitor creation
-  enabled: true
+  enabled: false
   
   # Namespace selector for ServiceMonitor
   namespaceSelector: {}
