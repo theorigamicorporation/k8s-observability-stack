@@ -28,7 +28,7 @@ global:
   priorityClassName: ""
 
   # serviceMonitor:
-  servideMonitor:
+  servicMonitor:
     enabled: false
 
 # -----------------------------------------------------------------------------
