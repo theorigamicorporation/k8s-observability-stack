@@ -1,4 +1,6 @@
 {{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
 {{/*
 ServiceMonitor resources for monitoring stack components
 These are compatible with both Prometheus Operator and VictoriaMetrics Operator

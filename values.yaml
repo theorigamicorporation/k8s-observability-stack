@@ -27,6 +27,10 @@ global:
   # Priority class name for all pods
   priorityClassName: ""
 
+  # serviceMonitor:
+  servideMonitor:
+    enabled: false
+
 # -----------------------------------------------------------------------------
 # Grafana Operator Configuration
 # -----------------------------------------------------------------------------
