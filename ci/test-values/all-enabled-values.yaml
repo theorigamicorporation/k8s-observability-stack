@@ -235,6 +235,6 @@ mixins:
 
 # Enable ServiceMonitors
 serviceMonitor:
-  enabled: true
+  enabled: false
   interval: 60s
   scrapeTimeout: 30s
