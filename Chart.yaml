@@ -37,6 +37,16 @@ annotations:
 
 dependencies:
   # =============================================================================
+  # Prometheus Operator CRDs (ServiceMonitor, PodMonitor, PrometheusRule, etc.)
+  # Must be installed before any component that creates ServiceMonitors
+  # =============================================================================
+  - name: prometheus-operator-crds
+    version: "26.0.1"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: prometheusOperatorCrds.enabled
+    alias: prometheusOperatorCrds
+    
+  # =============================================================================
   # Core Components - Always enabled by default
   # =============================================================================
   

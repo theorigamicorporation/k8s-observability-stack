@@ -28,6 +28,12 @@ global:
   priorityClassName: ""
 
 # -----------------------------------------------------------------------------
+# Prometheus Operator CRDs (ServiceMonitor, PodMonitor, PrometheusRule, etc.)
+# -----------------------------------------------------------------------------
+prometheusOperatorCrds:
+  enabled: true
+
+# -----------------------------------------------------------------------------
 # Grafana Operator Configuration
 # -----------------------------------------------------------------------------
 # Manages Grafana instances, datasources, and dashboards via Kubernetes CRDs
@@ -847,7 +853,7 @@ mixins:
 # Prometheus/VictoriaMetrics ServiceMonitor resources
 serviceMonitor:
   # Enable ServiceMonitor creation
-  enabled: false
+  enabled: true
   
   # Namespace selector for ServiceMonitor
   namespaceSelector: {}
