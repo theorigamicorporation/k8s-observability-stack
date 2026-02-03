@@ -76,7 +76,7 @@ dependencies:
   # VictoriaMetrics Cluster - For large clusters requiring horizontal scaling
   # https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-cluster
   - name: victoria-metrics-cluster
-    version: "0.33.0"
+    version: "0.34.0"
     repository: https://victoriametrics.github.io/helm-charts
     condition: victoriametrics.cluster.enabled
     alias: vmcluster
