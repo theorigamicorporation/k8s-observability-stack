@@ -49,17 +49,21 @@ spec:
               resources:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
-              {{- with .Values.grafana.instance.env }}
               env:
+                - name: GF_SECURITY_ADMIN_USER
+                  value: {{ .Values.grafana.instance.adminCredentials.username | default "admin" | quote }}
+                - name: GF_SECURITY_ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      {{- if .Values.grafana.instance.adminCredentials.existingSecret }}
+                      name: {{ .Values.grafana.instance.adminCredentials.existingSecret }}
+                      {{- else }}
+                      name: {{ include "k8s-observability-stack.grafanaAdminSecretName" . }}
+                      {{- end }}
+                      key: ADMIN_PASSWORD
+                {{- with .Values.grafana.instance.env }}
                 {{- toYaml . | nindent 16 }}
-              {{- end }}
-              envFrom:
-                - secretRef:
-                    {{- if .Values.grafana.instance.adminCredentials.existingSecret }}
-                    name: {{ .Values.grafana.instance.adminCredentials.existingSecret }}
-                    {{- else }}
-                    name: {{ include "k8s-observability-stack.grafanaAdminSecretName" . }}
-                    {{- end }}
+                {{- end }}
               {{- with .Values.grafana.instance.volumeMounts }}
               volumeMounts:
                 {{- toYaml . | nindent 16 }}
@@ -76,7 +80,6 @@ spec:
       disable_login_form: "false"
     security:
       admin_user: {{ .Values.grafana.instance.adminCredentials.username | default "admin" | quote }}
-      admin_password: ${ADMIN_PASSWORD}
     server:
       root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
       serve_from_sub_path: "true"
