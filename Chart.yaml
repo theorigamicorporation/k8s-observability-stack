@@ -68,7 +68,7 @@ dependencies:
   # VictoriaMetrics Single - For small to medium clusters
   # https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-single
   - name: victoria-metrics-single
-    version: "0.29.0"
+    version: "0.30.0"
     repository: https://victoriametrics.github.io/helm-charts
     condition: victoriametrics.single.enabled
     alias: vmsingle
