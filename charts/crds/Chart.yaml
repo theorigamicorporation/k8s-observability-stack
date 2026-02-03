@@ -3,4 +3,6 @@ name: crds
 version: 0.0.0
 # CRD Sources:
 # - Prometheus Operator v0.88.1: ServiceMonitor, PodMonitor, PrometheusRule
-# - Grafana Operator v5.21.4: Grafana, GrafanaDashboard, GrafanaDatasource, GrafanaFolder
+# - Grafana Operator v5.21.4: All 12 CRDs (Grafana, GrafanaDashboard, GrafanaDatasource, GrafanaFolder,
+#   GrafanaAlertRuleGroup, GrafanaContactPoint, GrafanaLibraryPanel, GrafanaMuteTiming,
+#   GrafanaNotificationPolicy, GrafanaNotificationPolicyRoute, GrafanaNotificationTemplate, GrafanaServiceAccount)
