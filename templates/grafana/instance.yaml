@@ -79,6 +79,7 @@ spec:
       admin_password: ${ADMIN_PASSWORD}
     server:
       root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+      serve_from_sub_path: "true"
     dashboards:
       default_home_dashboard_path: "/tmp/dashboards/kubernetes-overview.json"
     
