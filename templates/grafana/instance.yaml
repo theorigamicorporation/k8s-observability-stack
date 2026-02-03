@@ -13,19 +13,6 @@ metadata:
     {{- . | nindent 4 }}
   {{- end }}
 spec:
-  # Use custom admin credentials from secret
-  disableDefaultAdminSecret: true
-
-  # Tell operator where to find admin credentials for authentication
-  adminSecret:
-    {{- if .Values.grafana.instance.adminCredentials.existingSecret }}
-    name: {{ .Values.grafana.instance.adminCredentials.existingSecret }}
-    {{- else }}
-    name: {{ include "k8s-observability-stack.grafanaAdminSecretName" . }}
-    {{- end }}
-    usernameKey: GF_SECURITY_ADMIN_USER
-    passwordKey: GF_SECURITY_ADMIN_PASSWORD
-
   deployment:
     spec:
       {{- with .Values.grafana.instance.replicas }}
@@ -62,13 +49,6 @@ spec:
               resources:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
-              envFrom:
-                - secretRef:
-                    {{- if .Values.grafana.instance.adminCredentials.existingSecret }}
-                    name: {{ .Values.grafana.instance.adminCredentials.existingSecret }}
-                    {{- else }}
-                    name: {{ include "k8s-observability-stack.grafanaAdminSecretName" . }}
-                    {{- end }}
               {{- with .Values.grafana.instance.env }}
               env:
                 {{- toYaml . | nindent 16 }}
