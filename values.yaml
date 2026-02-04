@@ -497,10 +497,17 @@ vmalert:
 # Kubernetes state metrics exporter
 kube-state-metrics:
   enabled: true
-  
+
   # All kube-state-metrics chart values can be configured here
   # See: https://artifacthub.io/packages/helm/bitnami/kube-state-metrics
-  
+
+  # Use official kube-state-metrics image (more reliable than Bitnami default)
+  # https://github.com/kubernetes/kube-state-metrics/releases
+  image:
+    registry: registry.k8s.io
+    repository: kube-state-metrics/kube-state-metrics
+    tag: v2.18.0
+
   # Resource requirements
   resources:
     requests:
