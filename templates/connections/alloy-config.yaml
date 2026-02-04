@@ -237,9 +237,6 @@ data:
           max_shards           = 50
           max_samples_per_send = 2000
         }
-
-        // Retry configuration
-        retry_on_http_429 = true
       }
 
       // External labels
