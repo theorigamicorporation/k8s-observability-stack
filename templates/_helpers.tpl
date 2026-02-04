@@ -180,7 +180,7 @@ Get Loki URL
 {{- if .Values.grafana.datasources.loki.url -}}
 {{ .Values.grafana.datasources.loki.url }}
 {{- else -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-loki:3100
+http://{{ .Release.Name }}-loki:3100
 {{- end -}}
 {{- end }}
 
