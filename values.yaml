@@ -11,21 +11,25 @@
 global:
   # Cluster name used for labeling and identification
   clusterName: ""
-  
+
   # Default storage class for all persistent volumes
   storageClass: ""
-  
+
   # Common labels applied to all resources
   commonLabels: {}
-  
+
   # Common annotations applied to all resources
   commonAnnotations: {}
-  
+
   # Image pull secrets for private registries
   imagePullSecrets: []
-  
+
   # Priority class name for all pods
   priorityClassName: ""
+
+  # Allow non-Bitnami images (required for kube-state-metrics official image)
+  security:
+    allowInsecureImages: true
 
 # -----------------------------------------------------------------------------
 # Prometheus Operator CRDs (ServiceMonitor, PodMonitor, PrometheusRule, etc.)
