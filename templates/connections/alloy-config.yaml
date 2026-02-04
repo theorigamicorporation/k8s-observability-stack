@@ -208,15 +208,16 @@ data:
     {{- if index .Values "kube-state-metrics" "enabled" }}
     // --------------------------------------------------------------------------
     // Prometheus Scrape: kube-state-metrics
+    // Note: Subcharts use Release.Name as prefix, not fullname
     // --------------------------------------------------------------------------
     prometheus.scrape "kube_state_metrics" {
       targets = [
-        {"__address__" = "{{ include "k8s-observability-stack.fullname" . }}-kube-state-metrics:8080"},
+        {"__address__" = "{{ .Release.Name }}-kube-state-metrics:8080"},
       ]
       forward_to = [prometheus.remote_write.victoriametrics.receiver]
 
       scrape_interval = "30s"
-      
+
       // Add job label
       params = {
         "job" = ["kube-state-metrics"],
@@ -322,16 +323,17 @@ data:
     }
 
     // Export traces to backend
+    // Note: Subcharts use Release.Name as prefix, not fullname
     otelcol.exporter.otlp "traces" {
       client {
         {{- if .Values.victoriatraces.enabled }}
         {{- if eq .Values.victoriatraces.mode "cluster" }}
-        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-vtcluster:4317"
+        endpoint = "{{ .Release.Name }}-vtcluster:4317"
         {{- else }}
-        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-vtsingle-server:4317"
+        endpoint = "{{ .Release.Name }}-vtsingle-server:4317"
         {{- end }}
         {{- else if .Values.jaeger.enabled }}
-        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-jaeger-collector:4317"
+        endpoint = "{{ .Release.Name }}-jaeger-collector:4317"
         {{- end }}
 
         tls {
