@@ -496,7 +496,7 @@ vmalert:
 # -----------------------------------------------------------------------------
 # Kubernetes state metrics exporter
 kube-state-metrics:
-  enabled: false
+  enabled: true
   
   # All kube-state-metrics chart values can be configured here
   # See: https://artifacthub.io/packages/helm/bitnami/kube-state-metrics
