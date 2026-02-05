@@ -226,6 +226,131 @@ data:
     {{- end }}
 
     // --------------------------------------------------------------------------
+    // Prometheus Scrape: Kubernetes API Server
+    // --------------------------------------------------------------------------
+    prometheus.scrape "apiserver" {
+      targets = [
+        {"__address__" = "kubernetes.default.svc:443"},
+      ]
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      scheme = "https"
+      metrics_path = "/metrics"
+      tls_config {
+        ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+        insecure_skip_verify = true
+      }
+      authorization {
+        type             = "Bearer"
+        credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: CoreDNS
+    // --------------------------------------------------------------------------
+    discovery.relabel "coredns" {
+      targets = discovery.kubernetes.pods.targets
+
+      // Keep only CoreDNS pods
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_k8s_app"]
+        regex         = "kube-dns"
+        action        = "keep"
+      }
+
+      // Set the metrics port
+      rule {
+        source_labels = ["__meta_kubernetes_pod_ip"]
+        target_label  = "__address__"
+        replacement   = "$${1}:9153"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+      }
+    }
+
+    prometheus.scrape "coredns" {
+      targets    = discovery.relabel.coredns.output
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Node Exporter: Host-level metrics via Alloy's built-in unix exporter
+    // Provides node_* metrics compatible with Node Exporter dashboards
+    // --------------------------------------------------------------------------
+    prometheus.exporter.unix "node" {
+      // Enable common collectors for node metrics
+      enable_collectors = [
+        "cpu",
+        "diskstats",
+        "filesystem",
+        "loadavg",
+        "meminfo",
+        "netdev",
+        "uname",
+        "vmstat",
+      ]
+      // Disable collectors that require special permissions or aren't needed
+      disable_collectors = [
+        "arp",
+        "bcache",
+        "bonding",
+        "btrfs",
+        "conntrack",
+        "dmi",
+        "drbd",
+        "edac",
+        "entropy",
+        "fibrechannel",
+        "hwmon",
+        "infiniband",
+        "ipvs",
+        "mdadm",
+        "netclass",
+        "netstat",
+        "nfs",
+        "nfsd",
+        "nvme",
+        "os",
+        "powersupplyclass",
+        "pressure",
+        "rapl",
+        "schedstat",
+        "selinux",
+        "sockstat",
+        "softirqs",
+        "stat",
+        "tapestats",
+        "textfile",
+        "thermal_zone",
+        "time",
+        "timex",
+        "udp_queues",
+        "xfs",
+        "zfs",
+      ]
+    }
+
+    prometheus.scrape "node_exporter" {
+      targets    = prometheus.exporter.unix.node.targets
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
     // Remote Write: VictoriaMetrics
     // --------------------------------------------------------------------------
     prometheus.remote_write "victoriametrics" {
