@@ -230,8 +230,8 @@ metadata:
 data:
   ${filename}.json: |
 EOF
-        # Indent the JSON content
-        sed 's/^/    /' "${json_file}" >> "${configmap_file}"
+        # Indent the JSON content and escape Helm template syntax
+        sed 's/{{/{{`{{`}}/g' "${json_file}" | sed 's/^/    /' >> "${configmap_file}"
         echo "" >> "${configmap_file}"
 
         # Generate GrafanaDashboard CR

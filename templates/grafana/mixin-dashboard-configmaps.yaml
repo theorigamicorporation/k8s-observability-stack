@@ -258,7 +258,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum by (code) (code_resource:apiserver_request_total:rate5m{verb=\"read\", cluster=\"$cluster\"})",
-              "legendFormat": "{{ code }}"
+              "legendFormat": "{{`{{`}} code }}"
             }
           ],
           "title": "Read SLI - Requests",
@@ -302,7 +302,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum by (resource) (code_resource:apiserver_request_total:rate5m{verb=\"read\",code=~\"5..\", cluster=\"$cluster\"}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb=\"read\", cluster=\"$cluster\"})",
-              "legendFormat": "{{ resource }}"
+              "legendFormat": "{{`{{`}} resource }}"
             }
           ],
           "title": "Read SLI - Errors",
@@ -345,7 +345,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "cluster_quantile:apiserver_request_sli_duration_seconds:histogram_quantile{verb=\"read\", cluster=\"$cluster\"}",
-              "legendFormat": "{{ resource }}"
+              "legendFormat": "{{`{{`}} resource }}"
             }
           ],
           "title": "Read SLI - Duration",
@@ -477,7 +477,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum by (code) (code_resource:apiserver_request_total:rate5m{verb=\"write\", cluster=\"$cluster\"})",
-              "legendFormat": "{{ code }}"
+              "legendFormat": "{{`{{`}} code }}"
             }
           ],
           "title": "Write SLI - Requests",
@@ -521,7 +521,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum by (resource) (code_resource:apiserver_request_total:rate5m{verb=\"write\",code=~\"5..\", cluster=\"$cluster\"}) / sum by (resource) (code_resource:apiserver_request_total:rate5m{verb=\"write\", cluster=\"$cluster\"})",
-              "legendFormat": "{{ resource }}"
+              "legendFormat": "{{`{{`}} resource }}"
             }
           ],
           "title": "Write SLI - Errors",
@@ -564,7 +564,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "cluster_quantile:apiserver_request_sli_duration_seconds:histogram_quantile{verb=\"write\", cluster=\"$cluster\"}",
-              "legendFormat": "{{ resource }}"
+              "legendFormat": "{{`{{`}} resource }}"
             }
           ],
           "title": "Write SLI - Duration",
@@ -607,7 +607,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(workqueue_adds_total{job=\"kubernetes-apiserver\", instance=~\"$instance\", cluster=\"$cluster\"}[$__rate_interval])) by (instance, name)",
-              "legendFormat": "{{instance}} {{name}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}name}}"
             }
           ],
           "title": "Work Queue Add Rate",
@@ -650,7 +650,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(workqueue_depth{job=\"kubernetes-apiserver\", instance=~\"$instance\", cluster=\"$cluster\"}[$__rate_interval])) by (instance, name)",
-              "legendFormat": "{{instance}} {{name}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}name}}"
             }
           ],
           "title": "Work Queue Depth",
@@ -696,7 +696,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{job=\"kubernetes-apiserver\", instance=~\"$instance\", cluster=\"$cluster\"}[$__rate_interval])) by (instance, name, le))",
-              "legendFormat": "{{instance}} {{name}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}name}}"
             }
           ],
           "title": "Work Queue Latency",
@@ -738,7 +738,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "process_resident_memory_bytes{job=\"kubernetes-apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Memory",
@@ -781,7 +781,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "rate(process_cpu_seconds_total{job=\"kubernetes-apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}[$__rate_interval])",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "CPU usage",
@@ -823,7 +823,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "go_goroutines{job=\"kubernetes-apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Goroutines",
@@ -1810,7 +1810,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(workqueue_adds_total{cluster=\"$cluster\", job=\"kube-controller-manager\", instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance, name)",
-              "legendFormat": "{{cluster}} {{instance}} {{name}}"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} {{`{{`}}name}}"
             }
           ],
           "title": "Work Queue Add Rate",
@@ -1861,7 +1861,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(workqueue_depth{cluster=\"$cluster\", job=\"kube-controller-manager\", instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance, name)",
-              "legendFormat": "{{cluster}} {{instance}} {{name}}"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} {{`{{`}}name}}"
             }
           ],
           "title": "Work Queue Depth",
@@ -1912,7 +1912,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-controller-manager\", instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance, name, le))",
-              "legendFormat": "{{cluster}} {{instance}} {{name}}"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} {{`{{`}}name}}"
             }
           ],
           "title": "Work Queue Latency",
@@ -2038,7 +2038,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-controller-manager\", instance=~\"$instance\", verb=\"POST\"}[$__rate_interval])) by (verb, le))",
-              "legendFormat": "{{verb}}"
+              "legendFormat": "{{`{{`}}verb}}"
             }
           ],
           "title": "Post Request Latency 99th Quantile",
@@ -2089,7 +2089,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-controller-manager\", instance=~\"$instance\", verb=\"GET\"}[$__rate_interval])) by (verb, le))",
-              "legendFormat": "{{verb}}"
+              "legendFormat": "{{`{{`}}verb}}"
             }
           ],
           "title": "Get Request Latency 99th Quantile",
@@ -2140,7 +2140,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "process_resident_memory_bytes{cluster=\"$cluster\", job=\"kube-controller-manager\",instance=~\"$instance\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Memory",
@@ -2191,7 +2191,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "rate(process_cpu_seconds_total{cluster=\"$cluster\", job=\"kube-controller-manager\",instance=~\"$instance\"}[$__rate_interval])",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "CPU usage",
@@ -2242,7 +2242,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "go_goroutines{cluster=\"$cluster\", job=\"kube-controller-manager\",instance=~\"$instance\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Goroutines",
@@ -5589,7 +5589,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster=\"$cluster\", node=~\"$node\"})) by (pod)",
-              "legendFormat": "{{pod}}"
+              "legendFormat": "{{`{{`}}pod}}"
             }
           ],
           "title": "CPU Usage",
@@ -5869,7 +5869,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_memory_working_set_bytes{cluster=\"$cluster\", node=~\"$node\", container!=\"\"})) by (pod)",
-              "legendFormat": "{{pod}}"
+              "legendFormat": "{{`{{`}}pod}}"
             }
           ],
           "title": "Memory Usage (w/cache)",
@@ -6023,7 +6023,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_memory_rss{cluster=\"$cluster\", node=~\"$node\", container!=\"\"})) by (pod)",
-              "legendFormat": "{{pod}}"
+              "legendFormat": "{{`{{`}}pod}}"
             }
           ],
           "title": "Memory Usage (w/o cache)",
@@ -9202,7 +9202,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sort_desc(sum by (container) (rate(windows_container_network_received_bytes_total{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}[$__rate_interval])))",
-              "legendFormat": "Received : {{ container }}"
+              "legendFormat": "Received : {{`{{`}} container }}"
             },
             {
               "datasource": {
@@ -9210,7 +9210,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sort_desc(sum by (container) (rate(windows_container_network_transmitted_bytes_total{cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}[$__rate_interval])))",
-              "legendFormat": "Transmitted : {{ container }}"
+              "legendFormat": "Transmitted : {{`{{`}} container }}"
             }
           ],
           "title": "Network I/O",
@@ -10479,7 +10479,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(\n  max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{cluster=\"$cluster\", namespace=\"$namespace\"})\n* on(cluster, namespace, pod)\n  group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster=\"$cluster\", namespace=\"$namespace\", workload_type=~\"$type\"}\n) by (workload, workload_type)\n",
-              "legendFormat": "{{workload}} - {{workload_type}}"
+              "legendFormat": "{{`{{`}}workload}} - {{`{{`}}workload_type}}"
             },
             {
               "datasource": {
@@ -10774,7 +10774,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(\n    max by (cluster, namespace, pod, container)(container_memory_working_set_bytes{job=\"kubelet\", cluster=\"$cluster\", namespace=\"$namespace\", container!=\"\", image!=\"\"})\n  * on(cluster, namespace, pod)\n    group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster=\"$cluster\", namespace=\"$namespace\", workload_type=~\"$type\"}\n) by (workload, workload_type)\n",
-              "legendFormat": "{{workload}} - {{workload_type}}"
+              "legendFormat": "{{`{{`}}workload}} - {{`{{`}}workload_type}}"
             },
             {
               "datasource": {
@@ -11679,7 +11679,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "node:windows_node_cpu_utilisation:avg1m{cluster=\"$cluster\"} * node:windows_node_num_cpu:sum{cluster=\"$cluster\"} / scalar(sum(node:windows_node_num_cpu:sum{cluster=\"$cluster\"}))",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "CPU Utilisation",
@@ -11730,7 +11730,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "node:windows_node_memory_utilisation:ratio{cluster=\"$cluster\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Memory Utilisation",
@@ -11781,7 +11781,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "node:windows_node_memory_swap_io_pages:irate{cluster=\"$cluster\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Memory Saturation (Swap I/O Pages)",
@@ -11832,7 +11832,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "node:windows_node_disk_utilisation:avg_irate{cluster=\"$cluster\"} / scalar(node:windows_node:sum{cluster=\"$cluster\"})",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Disk IO Utilisation",
@@ -11883,7 +11883,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "node:windows_node_net_utilisation:sum_irate{cluster=\"$cluster\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Net Utilisation (Transmitted)",
@@ -11934,7 +11934,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "node:windows_node_net_saturation:sum_irate{cluster=\"$cluster\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Net Utilisation (Dropped)",
@@ -11985,7 +11985,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum by (instance)(node:windows_node_filesystem_usage:{cluster=\"$cluster\"})",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Disk Capacity",
@@ -12147,7 +12147,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum by (core) (irate(windows_cpu_time_total{cluster=\"$cluster\", job=\"kubernetes-windows-exporter\", mode!=\"idle\", instance=\"$instance\"}[$__rate_interval]))",
-              "legendFormat": "{{core}}"
+              "legendFormat": "{{`{{`}}core}}"
             }
           ],
           "title": "CPU Usage Per Core",
@@ -12499,7 +12499,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "node:windows_node_filesystem_usage:{cluster=\"$cluster\", instance=\"$instance\"}",
-              "legendFormat": "{{volume}}"
+              "legendFormat": "{{`{{`}}volume}}"
             }
           ],
           "title": "Disk Utilisation",
@@ -12947,7 +12947,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(kubelet_runtime_operations_total{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (operation_type, instance)",
-              "legendFormat": "{{instance}} {{operation_type}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}operation_type}}"
             }
           ],
           "title": "Operation Rate",
@@ -12998,7 +12998,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(kubelet_runtime_operations_errors_total{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance, operation_type)",
-              "legendFormat": "{{instance}} {{operation_type}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}operation_type}}"
             }
           ],
           "title": "Operation Error Rate",
@@ -13049,7 +13049,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(kubelet_runtime_operations_duration_seconds_bucket{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance, operation_type, le))",
-              "legendFormat": "{{instance}} {{operation_type}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}operation_type}}"
             }
           ],
           "title": "Operation Duration 99th quantile",
@@ -13100,7 +13100,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(kubelet_pod_start_duration_seconds_count{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance)",
-              "legendFormat": "{{instance}} pod"
+              "legendFormat": "{{`{{`}}instance}} pod"
             },
             {
               "datasource": {
@@ -13108,7 +13108,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(kubelet_pod_worker_duration_seconds_count{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance)",
-              "legendFormat": "{{instance}} worker"
+              "legendFormat": "{{`{{`}}instance}} worker"
             }
           ],
           "title": "Pod Start Rate",
@@ -13159,7 +13159,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(kubelet_pod_start_duration_seconds_bucket{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance, le))",
-              "legendFormat": "{{instance}} pod"
+              "legendFormat": "{{`{{`}}instance}} pod"
             },
             {
               "datasource": {
@@ -13167,7 +13167,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance, le))",
-              "legendFormat": "{{instance}} worker"
+              "legendFormat": "{{`{{`}}instance}} worker"
             }
           ],
           "title": "Pod Start Duration",
@@ -13218,7 +13218,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(storage_operation_duration_seconds_count{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance, operation_name, volume_plugin)",
-              "legendFormat": "{{instance}} {{operation_name}} {{volume_plugin}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}operation_name}} {{`{{`}}volume_plugin}}"
             }
           ],
           "title": "Storage Operation Rate",
@@ -13269,7 +13269,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(storage_operation_errors_total{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance, operation_name, volume_plugin)",
-              "legendFormat": "{{instance}} {{operation_name}} {{volume_plugin}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}operation_name}} {{`{{`}}volume_plugin}}"
             }
           ],
           "title": "Storage Operation Error Rate",
@@ -13320,7 +13320,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(storage_operation_duration_seconds_bucket{cluster=\"$cluster\", job=\"kubelet\", instance=~\"$instance\"}[$__rate_interval])) by (instance, operation_name, volume_plugin, le))",
-              "legendFormat": "{{instance}} {{operation_name}} {{volume_plugin}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}operation_name}} {{`{{`}}volume_plugin}}"
             }
           ],
           "title": "Storage Operation Duration 99th quantile",
@@ -13371,7 +13371,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(kubelet_cgroup_manager_duration_seconds_count{cluster=\"$cluster\", job=\"kubelet\", instance=~\"$instance\"}[$__rate_interval])) by (instance, operation_type)",
-              "legendFormat": "{{operation_type}}"
+              "legendFormat": "{{`{{`}}operation_type}}"
             }
           ],
           "title": "Cgroup manager operation rate",
@@ -13422,7 +13422,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(kubelet_cgroup_manager_duration_seconds_bucket{cluster=\"$cluster\", job=\"kubelet\", instance=~\"$instance\"}[$__rate_interval])) by (instance, operation_type, le))",
-              "legendFormat": "{{instance}} {{operation_type}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}operation_type}}"
             }
           ],
           "title": "Cgroup manager 99th quantile",
@@ -13473,7 +13473,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(kubelet_pleg_relist_duration_seconds_count{cluster=\"$cluster\", job=\"kubelet\", instance=~\"$instance\"}[$__rate_interval])) by (instance)",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "PLEG relist rate",
@@ -13524,7 +13524,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_interval_seconds_bucket{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance, le))",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "PLEG relist interval",
@@ -13575,7 +13575,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(kubelet_pleg_relist_duration_seconds_bucket{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])) by (instance, le))",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "PLEG relist duration",
@@ -13701,7 +13701,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{cluster=\"$cluster\",job=\"kubelet\", instance=~\"$instance\"}[$__rate_interval])) by (instance, verb, le))",
-              "legendFormat": "{{instance}} {{verb}}"
+              "legendFormat": "{{`{{`}}instance}} {{`{{`}}verb}}"
             }
           ],
           "title": "Request duration 99th quantile",
@@ -13752,7 +13752,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "process_resident_memory_bytes{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Memory",
@@ -13803,7 +13803,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "rate(process_cpu_seconds_total{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}[$__rate_interval])",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "CPU usage",
@@ -13854,7 +13854,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "go_goroutines{cluster=\"$cluster\",job=\"kubelet\",instance=~\"$instance\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Goroutines",
@@ -16335,7 +16335,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99,rate(kubeproxy_sync_proxy_rules_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-proxy\", instance=~\"$instance\"}[$__rate_interval]))",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Rules Sync Latency 99th Quantile",
@@ -16437,7 +16437,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(kubeproxy_network_programming_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-proxy\", instance=~\"$instance\"}[$__rate_interval])) by (instance, le))",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Network Programming Latency 99th Quantile",
@@ -16563,7 +16563,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-proxy\",instance=~\"$instance\",verb=\"POST\"}[$__rate_interval])) by (verb, le))",
-              "legendFormat": "{{verb}}"
+              "legendFormat": "{{`{{`}}verb}}"
             }
           ],
           "title": "Post Request Latency 99th Quantile",
@@ -16614,7 +16614,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-proxy\", instance=~\"$instance\", verb=\"GET\"}[$__rate_interval])) by (verb, le))",
-              "legendFormat": "{{verb}}"
+              "legendFormat": "{{`{{`}}verb}}"
             }
           ],
           "title": "Get Request Latency 99th Quantile",
@@ -16665,7 +16665,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "process_resident_memory_bytes{cluster=\"$cluster\", job=\"kube-proxy\",instance=~\"$instance\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Memory",
@@ -16716,7 +16716,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "rate(process_cpu_seconds_total{cluster=\"$cluster\", job=\"kube-proxy\",instance=~\"$instance\"}[$__rate_interval])",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "CPU usage",
@@ -16767,7 +16767,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "go_goroutines{cluster=\"$cluster\", job=\"kube-proxy\",instance=~\"$instance\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Goroutines",
@@ -16940,7 +16940,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(scheduler_scheduling_attempt_duration_seconds_count{cluster=\"$cluster\", job=\"kube-scheduler\", instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance)",
-              "legendFormat": "{{cluster}} {{instance}} e2e"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} e2e"
             },
             {
               "datasource": {
@@ -16948,7 +16948,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(scheduler_pod_scheduling_sli_duration_seconds_count{cluster=\"$cluster\", job=\"kube-scheduler\", instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance)",
-              "legendFormat": "{{cluster}} {{instance}} binding"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} binding"
             },
             {
               "datasource": {
@@ -16956,7 +16956,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(scheduler_scheduling_algorithm_duration_seconds_count{cluster=\"$cluster\", job=\"kube-scheduler\", instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance)",
-              "legendFormat": "{{cluster}} {{instance}} scheduling algorithm"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} scheduling algorithm"
             },
             {
               "datasource": {
@@ -16964,7 +16964,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "sum(rate(scheduler_volume_scheduling_duration_seconds_count{cluster=\"$cluster\", job=\"kube-scheduler\", instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance)",
-              "legendFormat": "{{cluster}} {{instance}} volume"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} volume"
             }
           ],
           "title": "Scheduling Rate",
@@ -17015,7 +17015,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(scheduler_scheduling_attempt_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance, le))",
-              "legendFormat": "{{cluster}} {{instance}} e2e"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} e2e"
             },
             {
               "datasource": {
@@ -17023,7 +17023,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(scheduler_pod_scheduling_sli_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance, le))",
-              "legendFormat": "{{cluster}} {{instance}} binding"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} binding"
             },
             {
               "datasource": {
@@ -17031,7 +17031,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(scheduler_scheduling_algorithm_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance, le))",
-              "legendFormat": "{{cluster}} {{instance}} scheduling algorithm"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} scheduling algorithm"
             },
             {
               "datasource": {
@@ -17039,7 +17039,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(scheduler_volume_scheduling_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-scheduler\",instance=~\"$instance\"}[$__rate_interval])) by (cluster, instance, le))",
-              "legendFormat": "{{cluster}} {{instance}} volume"
+              "legendFormat": "{{`{{`}}cluster}} {{`{{`}}instance}} volume"
             }
           ],
           "title": "Scheduling latency 99th Quantile",
@@ -17165,7 +17165,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-scheduler\", instance=~\"$instance\", verb=\"POST\"}[$__rate_interval])) by (verb, le))",
-              "legendFormat": "{{verb}}"
+              "legendFormat": "{{`{{`}}verb}}"
             }
           ],
           "title": "Post Request Latency 99th Quantile",
@@ -17216,7 +17216,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "histogram_quantile(0.99, sum(rate(rest_client_request_duration_seconds_bucket{cluster=\"$cluster\", job=\"kube-scheduler\", instance=~\"$instance\", verb=\"GET\"}[$__rate_interval])) by (verb, le))",
-              "legendFormat": "{{verb}}"
+              "legendFormat": "{{`{{`}}verb}}"
             }
           ],
           "title": "Get Request Latency 99th Quantile",
@@ -17267,7 +17267,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "process_resident_memory_bytes{cluster=\"$cluster\", job=\"kube-scheduler\", instance=~\"$instance\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Memory",
@@ -17318,7 +17318,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "rate(process_cpu_seconds_total{cluster=\"$cluster\", job=\"kube-scheduler\", instance=~\"$instance\"}[$__rate_interval])",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "CPU usage",
@@ -17369,7 +17369,7 @@ data:
                 "uid": "${datasource}"
               },
               "expr": "go_goroutines{cluster=\"$cluster\", job=\"kube-scheduler\",instance=~\"$instance\"}",
-              "legendFormat": "{{instance}}"
+              "legendFormat": "{{`{{`}}instance}}"
             }
           ],
           "title": "Goroutines",
@@ -18190,7 +18190,7 @@ data:
                 "targets": [
                    {
                       "expr": "sum(go_gc_duration_seconds{cluster=\"$cluster\", namespace=\"$namespace\", container=~\"$container\"}) by (quantile)",
-                      "legendFormat": "{{quantile}}",
+                      "legendFormat": "{{`{{`}}quantile}}",
                       "refId": "A"
                    }
                 ],
@@ -18636,7 +18636,7 @@ data:
                 "targets": [
                    {
                       "expr": "increase(kube_pod_container_status_last_terminated_reason{cluster=\"$cluster\", namespace=\"$namespace\", container=~\"$container\"}[30m]) > 0",
-                      "legendFormat": "{{reason}}",
+                      "legendFormat": "{{`{{`}}reason}}",
                       "refId": "A"
                    }
                 ],
@@ -18728,7 +18728,7 @@ data:
                 "targets": [
                    {
                       "expr": "sum(rate(promtail_custom_bad_words_total{cluster=\"$cluster\", exported_namespace=\"$namespace\", container=~\"$container\"}[$__rate_interval])) by (level)",
-                      "legendFormat": "{{level}}",
+                      "legendFormat": "{{`{{`}}level}}",
                       "refId": "A"
                    }
                 ],
@@ -18838,7 +18838,7 @@ data:
                    {
                       "expr": "sum(rate({cluster=\"$cluster\", namespace=\"$namespace\", container=~\"$container\" } |logfmt| level=~\"$level\" |= \"$filter\" | __error__=\"\" [$__auto])) by (level)",
                       "intervalFactor": 3,
-                      "legendFormat": "{{level}}",
+                      "legendFormat": "{{`{{`}}level}}",
                       "refId": "A"
                    }
                 ],
@@ -19197,7 +19197,7 @@ data:
                 "targets": [
                    {
                       "expr": "sum by (status) (\nlabel_replace(\n  label_replace(\n        rate(loki_request_duration_seconds_count{cluster=\"$cluster\", job=~\"($namespace)/query-frontend\", route=~\"api_prom_query|api_prom_label|api_prom_label_name_values|loki_api_v1_query|loki_api_v1_query_range|loki_api_v1_label|loki_api_v1_label_name_values\"}[$__rate_interval]),\n  \"status\", \"${1}xx\", \"status_code\", \"([0-9])..\"),\n\"status\", \"${1}\", \"status_code\", \"([a-z]+)\")\n)",
-                      "legendFormat": "{{status}}",
+                      "legendFormat": "{{`{{`}}status}}",
                       "refId": "A"
                    }
                 ],
@@ -19293,7 +19293,7 @@ data:
                 "targets": [
                    {
                       "expr": "sum by (status) (\nlabel_replace(\n  label_replace(\n          rate(loki_request_duration_seconds_count{cluster=\"$cluster\", job=~\"($namespace)/distributor\", route=~\"api_prom_push|loki_api_v1_push|otlp_v1_logs\"}[$__rate_interval]),\n   \"status\", \"${1}xx\", \"status_code\", \"([0-9])..\"),\n\"status\", \"${1}\", \"status_code\", \"([a-z]+)\"))",
-                      "legendFormat": "{{status}}",
+                      "legendFormat": "{{`{{`}}status}}",
                       "refId": "A"
                    }
                 ],
@@ -19390,7 +19390,7 @@ data:
                 "targets": [
                    {
                       "expr": "topk(5, sum by (name,level) (rate(promtail_custom_bad_words_total{cluster=\"$cluster\", exported_namespace=\"$namespace\"}[$__interval])) - \nsum by (name,level) (rate(promtail_custom_bad_words_total{cluster=\"$cluster\", exported_namespace=\"$namespace\"}[$__interval] offset 1h)))",
-                      "legendFormat": "{{name}}-{{level}}",
+                      "legendFormat": "{{`{{`}}name}}-{{`{{`}}level}}",
                       "refId": "A"
                    }
                 ],
@@ -19485,7 +19485,7 @@ data:
                 "targets": [
                    {
                       "expr": "topk(10, sum(rate(loki_distributor_lines_received_total{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (tenant))",
-                      "legendFormat": "{{tenant}}",
+                      "legendFormat": "{{`{{`}}tenant}}",
                       "refId": "A"
                    }
                 ],
@@ -19582,7 +19582,7 @@ data:
                 "targets": [
                    {
                       "expr": "topk(10, sum(rate(loki_distributor_bytes_received_total{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (tenant)) / 1024 / 1024",
-                      "legendFormat": "{{tenant}}",
+                      "legendFormat": "{{`{{`}}tenant}}",
                       "refId": "A"
                    }
                 ],
@@ -19678,7 +19678,7 @@ data:
                       "expr": "increase(kube_pod_container_status_restarts_total{cluster=\"$cluster\", namespace=\"$namespace\"}[10m]) > 0",
                       "hide": false,
                       "interval": "",
-                      "legendFormat": "{{container}}-{{pod}}",
+                      "legendFormat": "{{`{{`}}container}}-{{`{{`}}pod}}",
                       "refId": "B"
                    }
                 ],
@@ -19989,7 +19989,7 @@ data:
                    {
                       "expr": "sum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/distributor\", status_code!~\"5[0-9]{2}\"}[$__rate_interval])) by (route)\n/\nsum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/distributor\"}[$__rate_interval])) by (route) > 0",
                       "interval": "",
-                      "legendFormat": "{{route}}",
+                      "legendFormat": "{{`{{`}}route}}",
                       "refId": "A"
                    }
                 ],
@@ -20196,7 +20196,7 @@ data:
                    {
                       "expr": "sum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/(ingester.*|partition-ingester.*)\", status_code!~\"5[0-9]{2}\", route=\"/logproto.Pusher/Push\"}[$__rate_interval])) by (route)\n/\nsum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/(ingester.*|partition-ingester.*)\", route=\"/logproto.Pusher/Push\"}[$__rate_interval])) by (route) > 0",
                       "interval": "",
-                      "legendFormat": "{{route}}",
+                      "legendFormat": "{{`{{`}}route}}",
                       "refId": "A"
                    }
                 ],
@@ -20296,17 +20296,17 @@ data:
                 "targets": [
                    {
                       "expr": "histogram_quantile(0.99, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/querier\", route=~\"api_prom_query|api_prom_labels|api_prom_label_name_values|loki_api_v1_query|loki_api_v1_query_range|loki_api_v1_label|loki_api_v1_label_name_values\", cluster=\"$cluster\"}))",
-                      "legendFormat": "{{route}}-.99",
+                      "legendFormat": "{{`{{`}}route}}-.99",
                       "refId": "A"
                    },
                    {
                       "expr": "histogram_quantile(0.9, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/querier\", route=~\"api_prom_query|api_prom_labels|api_prom_label_name_values|loki_api_v1_query|loki_api_v1_query_range|loki_api_v1_label|loki_api_v1_label_name_values\", cluster=\"$cluster\"}))",
-                      "legendFormat": "{{route}}-.9",
+                      "legendFormat": "{{`{{`}}route}}-.9",
                       "refId": "B"
                    },
                    {
                       "expr": "histogram_quantile(0.5, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/querier\", route=~\"api_prom_query|api_prom_labels|api_prom_label_name_values|loki_api_v1_query|loki_api_v1_query_range|loki_api_v1_label|loki_api_v1_label_name_values\", cluster=\"$cluster\"}))",
-                      "legendFormat": "{{route}}-.5",
+                      "legendFormat": "{{`{{`}}route}}-.5",
                       "refId": "C"
                    }
                 ],
@@ -20403,17 +20403,17 @@ data:
                 "targets": [
                    {
                       "expr": "histogram_quantile(0.99, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/querier\", route=~\"api_prom_query|api_prom_labels|api_prom_label_name_values|loki_api_v1_query|loki_api_v1_query_range|loki_api_v1_label|loki_api_v1_label_name_values\", cluster=\"$cluster\"})) * 1e3",
-                      "legendFormat": ".99-{{route}}",
+                      "legendFormat": ".99-{{`{{`}}route}}",
                       "refId": "A"
                    },
                    {
                       "expr": "histogram_quantile(0.9, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/querier\", route=~\"api_prom_query|api_prom_labels|api_prom_label_name_values|loki_api_v1_query|loki_api_v1_query_range|loki_api_v1_label|loki_api_v1_label_name_values\", cluster=\"$cluster\"})) * 1e3",
-                      "legendFormat": ".9-{{route}}",
+                      "legendFormat": ".9-{{`{{`}}route}}",
                       "refId": "B"
                    },
                    {
                       "expr": "histogram_quantile(0.5, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/querier\", route=~\"api_prom_query|api_prom_labels|api_prom_label_name_values|loki_api_v1_query|loki_api_v1_query_range|loki_api_v1_label|loki_api_v1_label_name_values\", cluster=\"$cluster\"})) * 1e3",
-                      "legendFormat": ".5-{{route}}",
+                      "legendFormat": ".5-{{`{{`}}route}}",
                       "refId": "C"
                    }
                 ],
@@ -20510,7 +20510,7 @@ data:
                    {
                       "expr": "sum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/querier\", status_code!~\"5[0-9]{2}\"}[$__rate_interval])) by (route)\n/\nsum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/querier\"}[$__rate_interval])) by (route) > 0",
                       "interval": "",
-                      "legendFormat": "{{route}}",
+                      "legendFormat": "{{`{{`}}route}}",
                       "refId": "A"
                    }
                 ],
@@ -20609,17 +20609,17 @@ data:
                 "targets": [
                    {
                       "expr": "histogram_quantile(0.99, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/(ingester.*|partition-ingester.*)\", route=~\"/logproto.Querier/Query|/logproto.Querier/Label|/logproto.Querier/Series|/logproto.Querier/QuerySample|/logproto.Querier/GetChunkIDs\", cluster=\"$cluster\"})) * 1e3",
-                      "legendFormat": ".99-{{route}}",
+                      "legendFormat": ".99-{{`{{`}}route}}",
                       "refId": "A"
                    },
                    {
                       "expr": "histogram_quantile(0.9, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/(ingester.*|partition-ingester.*)\", route=~\"/logproto.Querier/Query|/logproto.Querier/Label|/logproto.Querier/Series|/logproto.Querier/QuerySample|/logproto.Querier/GetChunkIDs\", cluster=\"$cluster\"})) * 1e3",
-                      "legendFormat": ".9-{{route}}",
+                      "legendFormat": ".9-{{`{{`}}route}}",
                       "refId": "B"
                    },
                    {
                       "expr": "histogram_quantile(0.5, sum by (le,route) (cluster_job_route:loki_request_duration_seconds_bucket:sum_rate{job=~\"($namespace)/(ingester.*|partition-ingester.*)\", route=~\"/logproto.Querier/Query|/logproto.Querier/Label|/logproto.Querier/Series|/logproto.Querier/QuerySample|/logproto.Querier/GetChunkIDs\", cluster=\"$cluster\"})) * 1e3",
-                      "legendFormat": ".5-{{route}}",
+                      "legendFormat": ".5-{{`{{`}}route}}",
                       "refId": "C"
                    }
                 ],
@@ -20716,7 +20716,7 @@ data:
                    {
                       "expr": "sum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/(ingester.*|partition-ingester.*)\", status_code!~\"5[0-9]{2}\", route=~\"/logproto.Querier/Query|/logproto.Querier/Label|/logproto.Querier/Series|/logproto.Querier/QuerySample|/logproto.Querier/GetChunkIDs\"}[$__rate_interval])) by (route)\n/\nsum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/(ingester.*|partition-ingester.*)\", route=~\"/logproto.Querier/Query|/logproto.Querier/Label|/logproto.Querier/Series|/logproto.Querier/QuerySample|/logproto.Querier/GetChunkIDs\"}[$__rate_interval])) by (route) > 0",
                       "interval": "",
-                      "legendFormat": "{{route}}",
+                      "legendFormat": "{{`{{`}}route}}",
                       "refId": "A"
                    }
                 ],
@@ -20817,7 +20817,7 @@ data:
                          {
                             "expr": "topk(10,sum by (tenant, reason) (rate(loki_discarded_samples_total{cluster=\"$cluster\",namespace=\"$namespace\"}[$__rate_interval])))",
                             "interval": "",
-                            "legendFormat": "{{ tenant }} - {{ reason }}",
+                            "legendFormat": "{{`{{`}} tenant }} - {{`{{`}} reason }}",
                             "refId": "A"
                          }
                       ],
@@ -20977,7 +20977,7 @@ data:
                             "format": "table",
                             "instant": true,
                             "interval": "",
-                            "legendFormat": "{{ tenant }} - {{ reason }}",
+                            "legendFormat": "{{`{{`}} tenant }} - {{`{{`}} reason }}",
                             "refId": "A"
                          }
                       ],
@@ -21052,7 +21052,7 @@ data:
                          {
                             "expr": "sum by(pod) (rate(container_cpu_usage_seconds_total{cluster=~\"$cluster\", namespace=~\"$namespace\", container=~\".*distributor.*\"}[$__rate_interval]))",
                             "intervalFactor": 3,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -21149,7 +21149,7 @@ data:
                             "expr": "go_memstats_heap_inuse_bytes{cluster=\"$cluster\", namespace=\"$namespace\", container=~\".*distributor.*\"}",
                             "instant": false,
                             "intervalFactor": 3,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -21358,7 +21358,7 @@ data:
                             "expr": "sum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/distributor\", status_code!~\"5[0-9]{2}\"}[$__rate_interval])) by (route)\n/\nsum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/distributor\"}[$__rate_interval])) by (route) > 0",
                             "interval": "",
                             "intervalFactor": 1,
-                            "legendFormat": "{{route}}",
+                            "legendFormat": "{{`{{`}}route}}",
                             "refId": "A"
                          }
                       ],
@@ -21452,7 +21452,7 @@ data:
                          {
                             "expr": "sum(rate(loki_distributor_ingester_append_failures_total{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (pod)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -21546,7 +21546,7 @@ data:
                          {
                             "expr": "sum(rate(loki_distributor_bytes_received_total{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (pod)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -21640,7 +21640,7 @@ data:
                          {
                             "expr": "sum(rate(loki_distributor_lines_received_total{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (pod)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -21745,7 +21745,7 @@ data:
                          {
                             "expr": "sum by(pod) (rate(container_cpu_usage_seconds_total{cluster=~\"$cluster\", namespace=~\"$namespace\", container=~\".*ingester.*\"}[$__rate_interval]))",
                             "intervalFactor": 3,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -21842,7 +21842,7 @@ data:
                             "expr": "go_memstats_heap_inuse_bytes{cluster=\"$cluster\", namespace=\"$namespace\", container=~\".*ingester.*\"}",
                             "instant": false,
                             "intervalFactor": 3,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -22051,7 +22051,7 @@ data:
                             "expr": "sum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/(ingester.*|partition-ingester.*)\", status_code!~\"5[0-9]{2}\"}[$__rate_interval])) by (route)\n/\nsum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/(ingester.*|partition-ingester.*)\"}[$__rate_interval])) by (route) > 0",
                             "interval": "",
                             "intervalFactor": 1,
-                            "legendFormat": "{{route}}",
+                            "legendFormat": "{{`{{`}}route}}",
                             "refId": "A"
                          }
                       ],
@@ -22158,7 +22158,7 @@ data:
                          {
                             "expr": "topk(10,sum by (tenant) (loki_ingester_memory_streams{cluster=\"$cluster\",job=~\"($namespace)/(ingester.*|partition-ingester.*)\"}))",
                             "interval": "",
-                            "legendFormat": "{{ tenant }}",
+                            "legendFormat": "{{`{{`}} tenant }}",
                             "refId": "A"
                          }
                       ],
@@ -22249,7 +22249,7 @@ data:
                          {
                             "expr": "topk(10, sum by (tenant) (rate(loki_ingester_streams_created_total{cluster=\"$cluster\",job=~\"($namespace)/(ingester.*|partition-ingester.*)\"}[$__rate_interval]) > 0))",
                             "interval": "",
-                            "legendFormat": "{{ tenant }}",
+                            "legendFormat": "{{`{{`}} tenant }}",
                             "refId": "A"
                          }
                       ],
@@ -22445,7 +22445,7 @@ data:
                             "format": "heatmap",
                             "instant": false,
                             "interval": "",
-                            "legendFormat": "{{ le }}",
+                            "legendFormat": "{{`{{`}} le }}",
                             "refId": "A"
                          }
                       ],
@@ -22519,7 +22519,7 @@ data:
                          {
                             "expr": "sum by(reason) (rate(loki_ingester_chunks_flushed_total{cluster=~\"$cluster\",job=~\"($namespace)/(ingester.*|partition-ingester.*)\", namespace=~\"$namespace\"}[$__rate_interval])) / ignoring(reason) group_left sum(rate(loki_ingester_chunks_flushed_total{cluster=~\"$cluster\",job=~\"($namespace)/(ingester.*|partition-ingester.*)\", namespace=~\"$namespace\"}[$__rate_interval]))",
                             "interval": "",
-                            "legendFormat": "{{ reason }}"
+                            "legendFormat": "{{`{{`}} reason }}"
                          }
                       ],
                       "thresholds": [ ],
@@ -22600,7 +22600,7 @@ data:
                             "format": "heatmap",
                             "instant": false,
                             "interval": "",
-                            "legendFormat": "{{ le }}",
+                            "legendFormat": "{{`{{`}} le }}",
                             "refId": "A"
                          }
                       ],
@@ -22690,7 +22690,7 @@ data:
                          {
                             "expr": "sum by(pod) (rate(container_cpu_usage_seconds_total{cluster=~\"$cluster\", namespace=~\"$namespace\", container=~\".*querier.*\"}[$__rate_interval]))",
                             "intervalFactor": 3,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -22787,7 +22787,7 @@ data:
                             "expr": "go_memstats_heap_inuse_bytes{cluster=\"$cluster\", namespace=\"$namespace\", container=~\".*querier.*\"}",
                             "instant": false,
                             "intervalFactor": 3,
-                            "legendFormat": "{{pod}}",
+                            "legendFormat": "{{`{{`}}pod}}",
                             "refId": "A"
                          }
                       ],
@@ -22996,7 +22996,7 @@ data:
                             "expr": "sum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/querier\", status_code!~\"5[0-9]{2}\"}[$__rate_interval])) by (route)\n/\nsum(rate(loki_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", job=~\"($namespace)/querier\"}[$__rate_interval])) by (route) > 0",
                             "interval": "",
                             "intervalFactor": 1,
-                            "legendFormat": "{{route}}",
+                            "legendFormat": "{{`{{`}}route}}",
                             "refId": "A"
                          }
                       ],
@@ -23109,19 +23109,19 @@ data:
                          {
                             "expr": "histogram_quantile(.99, sum(rate(loki_memcache_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (method, name, le, container))",
                             "intervalFactor": 1,
-                            "legendFormat": "{{container}}: .99-{{method}}-{{name}}",
+                            "legendFormat": "{{`{{`}}container}}: .99-{{`{{`}}method}}-{{`{{`}}name}}",
                             "refId": "A"
                          },
                          {
                             "expr": "histogram_quantile(.9, sum(rate(loki_memcache_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (method, name, le, container))",
                             "hide": false,
-                            "legendFormat": "{{container}}: .9-{{method}}-{{name}}",
+                            "legendFormat": "{{`{{`}}container}}: .9-{{`{{`}}method}}-{{`{{`}}name}}",
                             "refId": "B"
                          },
                          {
                             "expr": "histogram_quantile(.5, sum(rate(loki_memcache_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (method, name, le, container))",
                             "hide": false,
-                            "legendFormat": "{{container}}: .5-{{method}}-{{name}}",
+                            "legendFormat": "{{`{{`}}container}}: .5-{{`{{`}}method}}-{{`{{`}}name}}",
                             "refId": "C"
                          }
                       ],
@@ -23213,7 +23213,7 @@ data:
                          {
                             "expr": "sum(rate(loki_memcache_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (status_code, method, name, container)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{container}}: {{status_code}}-{{method}}-{{name}}",
+                            "legendFormat": "{{`{{`}}container}}: {{`{{`}}status_code}}-{{`{{`}}method}}-{{`{{`}}name}}",
                             "refId": "A"
                          }
                       ],
@@ -23326,19 +23326,19 @@ data:
                          {
                             "expr": "histogram_quantile(.99, sum(rate(loki_consul_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "intervalFactor": 1,
-                            "legendFormat": ".99-{{operation}}",
+                            "legendFormat": ".99-{{`{{`}}operation}}",
                             "refId": "A"
                          },
                          {
                             "expr": "histogram_quantile(.9, sum(rate(loki_consul_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".9-{{operation}}",
+                            "legendFormat": ".9-{{`{{`}}operation}}",
                             "refId": "B"
                          },
                          {
                             "expr": "histogram_quantile(.5, sum(rate(loki_consul_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".5-{{operation}}",
+                            "legendFormat": ".5-{{`{{`}}operation}}",
                             "refId": "C"
                          }
                       ],
@@ -23435,7 +23435,7 @@ data:
                          {
                             "expr": "sum(rate(loki_consul_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, status_code, method)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}-{{operation}}",
+                            "legendFormat": "{{`{{`}}status_code}}-{{`{{`}}operation}}",
                             "refId": "A"
                          }
                       ],
@@ -23968,7 +23968,7 @@ data:
                          {
                             "expr": "sum(rate(loki_bigtable_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", operation=\"/google.bigtable.v2.Bigtable/MutateRows\"}[$__rate_interval])) by (status_code)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}",
+                            "legendFormat": "{{`{{`}}status_code}}",
                             "refId": "A"
                          }
                       ],
@@ -24063,7 +24063,7 @@ data:
                          {
                             "expr": "sum(rate(loki_bigtable_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", operation=\"/google.bigtable.v2.Bigtable/ReadRows\"}[$__rate_interval])) by (status_code)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}",
+                            "legendFormat": "{{`{{`}}status_code}}",
                             "refId": "A"
                          }
                       ],
@@ -24158,7 +24158,7 @@ data:
                          {
                             "expr": "sum(rate(loki_bigtable_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", operation=\"/google.bigtable.admin.v2.BigtableTableAdmin/GetTable\"}[$__rate_interval])) by (status_code)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}",
+                            "legendFormat": "{{`{{`}}status_code}}",
                             "refId": "A"
                          }
                       ],
@@ -24253,7 +24253,7 @@ data:
                          {
                             "expr": "sum(rate(loki_bigtable_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\", operation=\"/google.bigtable.admin.v2.BigtableTableAdmin/ListTables\"}[$__rate_interval])) by (status_code)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}",
+                            "legendFormat": "{{`{{`}}status_code}}",
                             "refId": "A"
                          }
                       ],
@@ -24366,19 +24366,19 @@ data:
                          {
                             "expr": "histogram_quantile(.99, sum(rate(loki_gcs_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "intervalFactor": 1,
-                            "legendFormat": ".99-{{operation}}",
+                            "legendFormat": ".99-{{`{{`}}operation}}",
                             "refId": "A"
                          },
                          {
                             "expr": "histogram_quantile(.9, sum(rate(loki_gcs_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".9-{{operation}}",
+                            "legendFormat": ".9-{{`{{`}}operation}}",
                             "refId": "B"
                          },
                          {
                             "expr": "histogram_quantile(.5, sum(rate(loki_gcs_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".5-{{operation}}",
+                            "legendFormat": ".5-{{`{{`}}operation}}",
                             "refId": "C"
                          }
                       ],
@@ -24470,7 +24470,7 @@ data:
                          {
                             "expr": "sum(rate(loki_gcs_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (status_code, operation)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}-{{operation}}",
+                            "legendFormat": "{{`{{`}}status_code}}-{{`{{`}}operation}}",
                             "refId": "A"
                          }
                       ],
@@ -25023,19 +25023,19 @@ data:
                          {
                             "expr": "histogram_quantile(.99, sum(rate(loki_dynamo_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "intervalFactor": 1,
-                            "legendFormat": ".99-{{operation}}",
+                            "legendFormat": ".99-{{`{{`}}operation}}",
                             "refId": "A"
                          },
                          {
                             "expr": "histogram_quantile(.9, sum(rate(loki_dynamo_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".9-{{operation}}",
+                            "legendFormat": ".9-{{`{{`}}operation}}",
                             "refId": "B"
                          },
                          {
                             "expr": "histogram_quantile(.5, sum(rate(loki_dynamo_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".5-{{operation}}",
+                            "legendFormat": ".5-{{`{{`}}operation}}",
                             "refId": "C"
                          }
                       ],
@@ -25126,7 +25126,7 @@ data:
                          {
                             "expr": "sum(rate(loki_dynamo_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (status_code, operation)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}-{{operation}}",
+                            "legendFormat": "{{`{{`}}status_code}}-{{`{{`}}operation}}",
                             "refId": "A"
                          }
                       ],
@@ -25238,19 +25238,19 @@ data:
                          {
                             "expr": "histogram_quantile(.99, sum(rate(loki_s3_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "intervalFactor": 1,
-                            "legendFormat": ".99-{{operation}}",
+                            "legendFormat": ".99-{{`{{`}}operation}}",
                             "refId": "A"
                          },
                          {
                             "expr": "histogram_quantile(.9, sum(rate(loki_s3_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".9-{{operation}}",
+                            "legendFormat": ".9-{{`{{`}}operation}}",
                             "refId": "B"
                          },
                          {
                             "expr": "histogram_quantile(.5, sum(rate(loki_s3_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".5-{{operation}}",
+                            "legendFormat": ".5-{{`{{`}}operation}}",
                             "refId": "C"
                          }
                       ],
@@ -25341,7 +25341,7 @@ data:
                          {
                             "expr": "sum(rate(loki_s3_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (status_code, operation)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}-{{operation}}",
+                            "legendFormat": "{{`{{`}}status_code}}-{{`{{`}}operation}}",
                             "refId": "A"
                          }
                       ],
@@ -25453,19 +25453,19 @@ data:
                          {
                             "expr": "histogram_quantile(.99, sum(rate(loki_azure_blob_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "intervalFactor": 1,
-                            "legendFormat": ".99-{{operation}}",
+                            "legendFormat": ".99-{{`{{`}}operation}}",
                             "refId": "A"
                          },
                          {
                             "expr": "histogram_quantile(.9, sum(rate(loki_azure_blob_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".9-{{operation}}",
+                            "legendFormat": ".9-{{`{{`}}operation}}",
                             "refId": "B"
                          },
                          {
                             "expr": "histogram_quantile(.5, sum(rate(loki_azure_blob_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".5-{{operation}}",
+                            "legendFormat": ".5-{{`{{`}}operation}}",
                             "refId": "C"
                          }
                       ],
@@ -25556,7 +25556,7 @@ data:
                          {
                             "expr": "sum(rate(loki_azure_blob_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (status_code, operation)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}-{{operation}}",
+                            "legendFormat": "{{`{{`}}status_code}}-{{`{{`}}operation}}",
                             "refId": "A"
                          }
                       ],
@@ -25668,19 +25668,19 @@ data:
                          {
                             "expr": "histogram_quantile(.99, sum(rate(loki_boltdb_shipper_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "intervalFactor": 1,
-                            "legendFormat": ".99-{{operation}}",
+                            "legendFormat": ".99-{{`{{`}}operation}}",
                             "refId": "A"
                          },
                          {
                             "expr": "histogram_quantile(.9, sum(rate(loki_boltdb_shipper_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".9-{{operation}}",
+                            "legendFormat": ".9-{{`{{`}}operation}}",
                             "refId": "B"
                          },
                          {
                             "expr": "histogram_quantile(.5, sum(rate(loki_boltdb_shipper_request_duration_seconds_bucket{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (operation, le))",
                             "hide": false,
-                            "legendFormat": ".5-{{operation}}",
+                            "legendFormat": ".5-{{`{{`}}operation}}",
                             "refId": "C"
                          }
                       ],
@@ -25771,7 +25771,7 @@ data:
                          {
                             "expr": "sum(rate(loki_boltdb_shipper_request_duration_seconds_count{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])) by (status_code, operation)",
                             "intervalFactor": 1,
-                            "legendFormat": "{{status_code}}-{{operation}}",
+                            "legendFormat": "{{`{{`}}status_code}}-{{`{{`}}operation}}",
                             "refId": "A"
                          }
                       ],
@@ -26006,7 +26006,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "((\n  instance:node_cpu_utilisation:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"}\n  *\n  instance:node_num_cpu:sum{job=\"node-exporter\", cluster=~\"$cluster\"}\n) != 0 )\n/ scalar(sum(instance:node_num_cpu:sum{job=\"node-exporter\", cluster=~\"$cluster\"}))\n",
-              "legendFormat": "{{ instance }}"
+              "legendFormat": "{{`{{`}} instance }}"
             }
           ],
           "title": "CPU Utilisation",
@@ -26053,7 +26053,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "(\n  instance:node_load1_per_cpu:ratio{job=\"node-exporter\", cluster=~\"$cluster\"}\n  / scalar(count(instance:node_load1_per_cpu:ratio{job=\"node-exporter\", cluster=~\"$cluster\"}))\n)  != 0\n",
-              "legendFormat": "{{ instance }}"
+              "legendFormat": "{{`{{`}} instance }}"
             }
           ],
           "title": "CPU Saturation (Load1 per CPU)",
@@ -26113,7 +26113,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "(\n  instance:node_memory_utilisation:ratio{job=\"node-exporter\", cluster=~\"$cluster\"}\n  / scalar(count(instance:node_memory_utilisation:ratio{job=\"node-exporter\", cluster=~\"$cluster\"}))\n) != 0\n",
-              "legendFormat": "{{ instance }}"
+              "legendFormat": "{{`{{`}} instance }}"
             }
           ],
           "title": "Memory Utilisation",
@@ -26160,7 +26160,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance:node_vmstat_pgmajfault:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"}",
-              "legendFormat": "{{ instance }}"
+              "legendFormat": "{{`{{`}} instance }}"
             }
           ],
           "title": "Memory Saturation (Major Page Faults)",
@@ -26234,7 +26234,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance:node_network_receive_bytes_excluding_lo:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"} != 0",
-              "legendFormat": "{{ instance }} Receive"
+              "legendFormat": "{{`{{`}} instance }} Receive"
             },
             {
               "datasource": {
@@ -26242,7 +26242,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance:node_network_transmit_bytes_excluding_lo:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"} != 0",
-              "legendFormat": "{{ instance }} Transmit"
+              "legendFormat": "{{`{{`}} instance }} Transmit"
             }
           ],
           "title": "Network Utilisation (Bytes Receive/Transmit)",
@@ -26303,7 +26303,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance:node_network_receive_drop_excluding_lo:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"} != 0",
-              "legendFormat": "{{ instance }} Receive"
+              "legendFormat": "{{`{{`}} instance }} Receive"
             },
             {
               "datasource": {
@@ -26311,7 +26311,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance:node_network_transmit_drop_excluding_lo:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"} != 0",
-              "legendFormat": "{{ instance }} Transmit"
+              "legendFormat": "{{`{{`}} instance }} Transmit"
             }
           ],
           "title": "Network Saturation (Drops Receive/Transmit)",
@@ -26371,7 +26371,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"}\n/ scalar(count(instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"}))\n",
-              "legendFormat": "{{ instance }} {{device}}"
+              "legendFormat": "{{`{{`}} instance }} {{`{{`}}device}}"
             }
           ],
           "title": "Disk IO Utilisation",
@@ -26418,7 +26418,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"}\n/ scalar(count(instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\", cluster=~\"$cluster\"}))\n",
-              "legendFormat": "{{ instance }} {{device}}"
+              "legendFormat": "{{`{{`}} instance }} {{`{{`}}device}}"
             }
           ],
           "title": "Disk IO Saturation",
@@ -26478,7 +26478,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "sum without (device) (\n  max without (fstype, mountpoint) ((\n    node_filesystem_size_bytes{job=\"node-exporter\", fstype!=\"\", mountpoint!=\"\", cluster=~\"$cluster\"}\n    -\n    node_filesystem_avail_bytes{job=\"node-exporter\", fstype!=\"\", mountpoint!=\"\", cluster=~\"$cluster\"}\n  ) != 0)\n)\n/ scalar(sum(max without (fstype, mountpoint) (node_filesystem_size_bytes{job=\"node-exporter\", fstype!=\"\", mountpoint!=\"\", cluster=~\"$cluster\"})))\n",
-              "legendFormat": "{{ instance }}"
+              "legendFormat": "{{`{{`}} instance }}"
             }
           ],
           "title": "Disk Space Utilisation",
@@ -26957,7 +26957,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\"} != 0",
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Disk IO Utilisation",
@@ -27004,7 +27004,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\"} != 0",
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Disk IO Saturation",
@@ -27064,7 +27064,7 @@ data:
                 "uid": "$datasource"
               },
               "expr": "sort_desc(1 -\n  (\n    max without (mountpoint, fstype) (node_filesystem_avail_bytes{job=\"node-exporter\", fstype!=\"\", instance=\"$instance\", cluster=~\"$cluster\"})\n    /\n    max without (mountpoint, fstype) (node_filesystem_size_bytes{job=\"node-exporter\", fstype!=\"\", instance=\"$instance\", cluster=~\"$cluster\"})\n  ) != 0\n)\n",
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Disk Space Utilisation",
@@ -27188,7 +27188,7 @@ data:
               },
               "expr": "(\n  (1 - sum without (mode) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode=~\"idle|iowait|steal\", instance=\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])))\n/ ignoring(cpu) group_left\n  count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\", instance=\"$instance\", cluster=~\"$cluster\"})\n)\n",
               "intervalFactor": 5,
-              "legendFormat": "{{cpu}}"
+              "legendFormat": "{{`{{`}}cpu}}"
             }
           ],
           "title": "CPU Usage",
@@ -27444,7 +27444,7 @@ data:
               },
               "expr": "rate(node_disk_read_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} read"
+              "legendFormat": "{{`{{`}}device}} read"
             },
             {
               "datasource": {
@@ -27453,7 +27453,7 @@ data:
               },
               "expr": "rate(node_disk_written_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} written"
+              "legendFormat": "{{`{{`}}device}} written"
             },
             {
               "datasource": {
@@ -27462,7 +27462,7 @@ data:
               },
               "expr": "rate(node_disk_io_time_seconds_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} io time"
+              "legendFormat": "{{`{{`}}device}} io time"
             }
           ],
           "title": "Disk I/O",
@@ -27735,7 +27735,7 @@ data:
               },
               "expr": "rate(node_network_receive_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"lo\"}[$__rate_interval]) * 8",
               "intervalFactor": 1,
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Network Received",
@@ -27777,7 +27777,7 @@ data:
               },
               "expr": "rate(node_network_transmit_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"lo\"}[$__rate_interval]) * 8",
               "intervalFactor": 1,
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Network Transmitted",
@@ -27901,7 +27901,7 @@ data:
               },
               "expr": "(\n  (1 - sum without (mode) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode=~\"idle|iowait|steal\", instance=\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])))\n/ ignoring(cpu) group_left\n  count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\", instance=\"$instance\", cluster=~\"$cluster\"})\n)\n",
               "intervalFactor": 5,
-              "legendFormat": "{{cpu}}"
+              "legendFormat": "{{`{{`}}cpu}}"
             }
           ],
           "title": "CPU Usage",
@@ -28181,7 +28181,7 @@ data:
               },
               "expr": "rate(node_disk_read_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} read"
+              "legendFormat": "{{`{{`}}device}} read"
             },
             {
               "datasource": {
@@ -28190,7 +28190,7 @@ data:
               },
               "expr": "rate(node_disk_written_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} written"
+              "legendFormat": "{{`{{`}}device}} written"
             },
             {
               "datasource": {
@@ -28199,7 +28199,7 @@ data:
               },
               "expr": "rate(node_disk_io_time_seconds_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} io time"
+              "legendFormat": "{{`{{`}}device}} io time"
             }
           ],
           "title": "Disk I/O",
@@ -28472,7 +28472,7 @@ data:
               },
               "expr": "rate(node_network_receive_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"lo\"}[$__rate_interval]) * 8",
               "intervalFactor": 1,
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Network Received",
@@ -28514,7 +28514,7 @@ data:
               },
               "expr": "rate(node_network_transmit_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"lo\"}[$__rate_interval]) * 8",
               "intervalFactor": 1,
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Network Transmitted",
@@ -28638,7 +28638,7 @@ data:
               },
               "expr": "(\n  (1 - sum without (mode) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode=~\"idle|iowait|steal\", instance=\"$instance\", cluster=~\"$cluster\"}[$__rate_interval])))\n/ ignoring(cpu) group_left\n  count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\", instance=\"$instance\", cluster=~\"$cluster\"})\n)\n",
               "intervalFactor": 5,
-              "legendFormat": "{{cpu}}"
+              "legendFormat": "{{`{{`}}cpu}}"
             }
           ],
           "title": "CPU Usage",
@@ -28910,7 +28910,7 @@ data:
               },
               "expr": "rate(node_disk_read_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} read"
+              "legendFormat": "{{`{{`}}device}} read"
             },
             {
               "datasource": {
@@ -28919,7 +28919,7 @@ data:
               },
               "expr": "rate(node_disk_written_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} written"
+              "legendFormat": "{{`{{`}}device}} written"
             },
             {
               "datasource": {
@@ -28928,7 +28928,7 @@ data:
               },
               "expr": "rate(node_disk_io_time_seconds_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"\"}[$__rate_interval])",
               "intervalFactor": 1,
-              "legendFormat": "{{device}} io time"
+              "legendFormat": "{{`{{`}}device}} io time"
             }
           ],
           "title": "Disk I/O",
@@ -29201,7 +29201,7 @@ data:
               },
               "expr": "rate(node_network_receive_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"lo\"}[$__rate_interval]) * 8",
               "intervalFactor": 1,
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Network Received",
@@ -29243,7 +29243,7 @@ data:
               },
               "expr": "rate(node_network_transmit_bytes_total{job=\"node-exporter\", instance=\"$instance\", cluster=~\"$cluster\", device!=\"lo\"}[$__rate_interval]) * 8",
               "intervalFactor": 1,
-              "legendFormat": "{{device}}"
+              "legendFormat": "{{`{{`}}device}}"
             }
           ],
           "title": "Network Transmitted",
@@ -29342,7 +29342,7 @@ data:
             "hide": false,
             "iconColor": "red",
             "name": "alerts",
-            "titleFormat": "{{alertname}}"
+            "titleFormat": "{{`{{`}}alertname}}"
           },
           {
             "datasource": {
@@ -29354,7 +29354,7 @@ data:
             "hide": true,
             "iconColor": "dark-blue",
             "name": "version",
-            "textFormat": "{{version}}",
+            "textFormat": "{{`{{`}}version}}",
             "titleFormat": "Version change"
           }
         ]
@@ -30200,7 +30200,7 @@ data:
               "expr": "sum(min_over_time(vm_app_version{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (job)",
               "format": "time_series",
               "instant": false,
-              "legendFormat": "{{job}}",
+              "legendFormat": "{{`{{`}}job}}",
               "refId": "A"
             }
           ],
@@ -30320,7 +30320,7 @@ data:
               "expr": "sum(rate(vm_rows_inserted_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (type, instance) > 0",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "{{instance}} - {{type}}",
+              "legendFormat": "{{`{{`}}instance}} - {{`{{`}}type}}",
               "range": true,
               "refId": "A"
             }
@@ -30431,7 +30431,7 @@ data:
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "{{path}}",
+              "legendFormat": "{{`{{`}}path}}",
               "range": true,
               "refId": "A"
             }
@@ -30546,7 +30546,7 @@ data:
               "expr": "sum(vm_cache_entries{job=~\"$job\", instance=~\"$instance\", type=\"storage/hour_metric_ids\"})",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "{{instance}}",
+              "legendFormat": "{{`{{`}}instance}}",
               "range": true,
               "refId": "A"
             }
@@ -30656,7 +30656,7 @@ data:
               "expr": "max(vm_request_duration_seconds{job=~\"$job\", instance=~\"$instance\", quantile=\"0.99\"}) by (path) > 0",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "{{path}}",
+              "legendFormat": "{{`{{`}}path}}",
               "range": true,
               "refId": "A"
             }
@@ -30765,7 +30765,7 @@ data:
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "{{path}}",
+              "legendFormat": "{{`{{`}}path}}",
               "range": true,
               "refId": "A"
             }
@@ -30878,7 +30878,7 @@ data:
               "editorMode": "code",
               "expr": "sum(rate(vm_log_messages_total{job=~\"$job\",instance=~\"$instance\", level!=\"info\"}[$__rate_interval])) by (job, level) > 0",
               "interval": "5m",
-              "legendFormat": "{{job}} - {{level}}",
+              "legendFormat": "{{`{{`}}job}} - {{`{{`}}level}}",
               "range": true,
               "refId": "A"
             }
@@ -31350,7 +31350,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{job}}-{{instance}} - waiting",
+                  "legendFormat": "{{`{{`}}job}}-{{`{{`}}instance}} - waiting",
                   "range": true,
                   "refId": "A"
                 },
@@ -31364,7 +31364,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{job}}-{{instance}} - waiting",
+                  "legendFormat": "{{`{{`}}job}}-{{`{{`}}instance}} - waiting",
                   "range": true,
                   "refId": "B"
                 }
@@ -31479,7 +31479,7 @@ data:
                   "expr": "sum(go_memstats_sys_bytes{job=~\"$job\", instance=~\"$instance\"}) by (job) + sum(vm_cache_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by (job)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - requested from system",
+                  "legendFormat": "{{`{{`}}job}} - requested from system",
                   "range": true,
                   "refId": "A"
                 },
@@ -31492,7 +31492,7 @@ data:
                   "expr": "sum(go_memstats_heap_inuse_bytes{job=~\"$job\", instance=~\"$instance\"}) by (job) + sum(vm_cache_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by (job)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - heap inuse",
+                  "legendFormat": "{{`{{`}}job}} - heap inuse",
                   "range": true,
                   "refId": "B"
                 },
@@ -31505,7 +31505,7 @@ data:
                   "expr": "sum(go_memstats_stack_inuse_bytes{job=~\"$job\", instance=~\"$instance\"}) by (job)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - stack inuse",
+                  "legendFormat": "{{`{{`}}job}} - stack inuse",
                   "range": true,
                   "refId": "C"
                 },
@@ -31519,7 +31519,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - resident",
+                  "legendFormat": "{{`{{`}}job}} - resident",
                   "range": true,
                   "refId": "D"
                 },
@@ -31534,7 +31534,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - resident anonymous",
+                  "legendFormat": "{{`{{`}}job}} - resident anonymous",
                   "range": true,
                   "refId": "E"
                 }
@@ -31661,7 +31661,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{instance}}",
+                  "legendFormat": "{{`{{`}}instance}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -31784,7 +31784,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{job}} - waiting",
+                  "legendFormat": "{{`{{`}}job}} - waiting",
                   "range": true,
                   "refId": "A"
                 },
@@ -31798,7 +31798,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{job}} - stalled",
+                  "legendFormat": "{{`{{`}}job}} - stalled",
                   "range": true,
                   "refId": "B"
                 }
@@ -31921,7 +31921,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - read",
+                  "legendFormat": "{{`{{`}}job}} - read",
                   "range": true,
                   "refId": "A"
                 },
@@ -31935,7 +31935,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - write",
+                  "legendFormat": "{{`{{`}}job}} - write",
                   "range": true,
                   "refId": "B"
                 }
@@ -32064,7 +32064,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -32187,7 +32187,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - read calls",
+                  "legendFormat": "{{`{{`}}job}} - read calls",
                   "range": true,
                   "refId": "A"
                 },
@@ -32201,7 +32201,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - write calls",
+                  "legendFormat": "{{`{{`}}job}} - write calls",
                   "range": true,
                   "refId": "B"
                 }
@@ -32311,7 +32311,7 @@ data:
                   "expr": "sum(go_goroutines{job=~\"$job\", instance=~\"$instance\"}) by(job)",
                   "format": "time_series",
                   "intervalFactor": 2,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -32419,7 +32419,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{job}} - waiting",
+                  "legendFormat": "{{`{{`}}job}} - waiting",
                   "range": true,
                   "refId": "A"
                 },
@@ -32433,7 +32433,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{job}} - stalled",
+                  "legendFormat": "{{`{{`}}job}} - stalled",
                   "range": true,
                   "refId": "B"
                 }
@@ -32654,7 +32654,7 @@ data:
                   "expr": "sum(vm_tcplistener_conns{job=~\"$job\", instance=~\"$instance\"}) by(job)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -32873,7 +32873,7 @@ data:
                   "expr": "sum(rate(vm_tcplistener_accepts_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -33211,7 +33211,7 @@ data:
                   "expr": "sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(name) * 8 > 0",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "read via {{name}}",
+                  "legendFormat": "read via {{`{{`}}name}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -33224,7 +33224,7 @@ data:
                   "expr": "sum(rate(vm_tcplistener_written_bytes_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(name) * 8 > 0",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "write via {{name}}",
+                  "legendFormat": "write via {{`{{`}}name}}",
                   "range": true,
                   "refId": "B"
                 }
@@ -33581,7 +33581,7 @@ data:
                   "format": "time_series",
                   "interval": "5m",
                   "intervalFactor": 1,
-                  "legendFormat": "{{instance}} - {{type}}",
+                  "legendFormat": "{{`{{`}}instance}} - {{`{{`}}type}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -33691,7 +33691,7 @@ data:
                   "expr": "sum(rate(vm_slow_queries_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (job)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -34020,7 +34020,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(increase(vm_rows_ignored_total{job=~\"$job\", instance=~\"$instance\"}[1h])) by (job, reason)",
                   "interval": "",
-                  "legendFormat": "{{instance}} - {{reason}}",
+                  "legendFormat": "{{`{{`}}instance}} - {{`{{`}}reason}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -34032,7 +34032,7 @@ data:
                   "editorMode": "code",
                   "expr": "sum(increase(vm_relabel_metrics_dropped_total{job=~\"$job\", instance=~\"$instance\"}[1h])) by(job)",
                   "instant": false,
-                  "legendFormat": "{{job}} - relabeling",
+                  "legendFormat": "{{`{{`}}job}} - relabeling",
                   "range": true,
                   "refId": "B"
                 }
@@ -34367,7 +34367,7 @@ data:
                   "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) > 0) by(job)",
                   "format": "time_series",
                   "instant": false,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "refId": "A"
                 }
               ],
@@ -34600,7 +34600,7 @@ data:
                   "expr": "sum(rate(vm_rows_inserted_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by ( job,type) > 0",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - {{type}}",
+                  "legendFormat": "{{`{{`}}job}} - {{`{{`}}type}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -34988,7 +34988,7 @@ data:
                   "expr": "vm_pending_rows{job=~\"$job\", instance=~\"$instance\", type=\"storage\"}",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - pending datapoints",
+                  "legendFormat": "{{`{{`}}job}} - pending datapoints",
                   "range": true,
                   "refId": "A"
                 },
@@ -35001,7 +35001,7 @@ data:
                   "expr": "vm_pending_rows{job=~\"$job\", instance=~\"$instance\", type=\"indexdb\"}",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - pending index entries",
+                  "legendFormat": "{{`{{`}}job}} - pending index entries",
                   "range": true,
                   "refId": "B"
                 }
@@ -35108,7 +35108,7 @@ data:
                   },
                   "editorMode": "code",
                   "expr": "sum(vm_active_merges{job=~\"$job\", instance=~\"$instance\"}) by(job, type)",
-                  "legendFormat": "{{job}} - {{type}}",
+                  "legendFormat": "{{`{{`}}job}} - {{`{{`}}type}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -35217,7 +35217,7 @@ data:
                   },
                   "editorMode": "code",
                   "expr": "sum(rate(vm_rows_merged_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type)",
-                  "legendFormat": "{{job}} - {{type}}",
+                  "legendFormat": "{{`{{`}}job}} - {{`{{`}}type}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -35468,7 +35468,7 @@ data:
                   "expr": "sum(vm_parts{job=~\"$job\", instance=~\"$instance\", type=~\"indexdb.*\"}) by (job, type)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - {{type}}",
+                  "legendFormat": "{{`{{`}}job}} - {{`{{`}}type}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -35481,7 +35481,7 @@ data:
                   "expr": "max(vm_last_partition_parts{job=~\"$job\", instance=~\"$instance\"}) by(job, type)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - {{type}}",
+                  "legendFormat": "{{`{{`}}job}} - {{`{{`}}type}}",
                   "range": true,
                   "refId": "B"
                 }
@@ -35717,7 +35717,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - Used (datapoints)",
+                  "legendFormat": "{{`{{`}}job}} - Used (datapoints)",
                   "range": true,
                   "refId": "A"
                 },
@@ -35731,7 +35731,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - Free",
+                  "legendFormat": "{{`{{`}}job}} - Free",
                   "range": true,
                   "refId": "B"
                 },
@@ -35745,7 +35745,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - Used (index)",
+                  "legendFormat": "{{`{{`}}job}} - Used (index)",
                   "range": true,
                   "refId": "C"
                 }
@@ -35873,7 +35873,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - total datapoints",
+                  "legendFormat": "{{`{{`}}job}} - total datapoints",
                   "range": true,
                   "refId": "A"
                 },
@@ -35887,7 +35887,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}} - bytes-per-datapoint",
+                  "legendFormat": "{{`{{`}}job}} - bytes-per-datapoint",
                   "range": true,
                   "refId": "B"
                 }
@@ -36137,7 +36137,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{instance}} - {{reason}}",
+                  "legendFormat": "{{`{{`}}instance}} - {{`{{`}}reason}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -36249,7 +36249,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -36374,7 +36374,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{instance}} - max",
+                  "legendFormat": "{{`{{`}}instance}} - max",
                   "range": true,
                   "refId": "A"
                 },
@@ -36387,7 +36387,7 @@ data:
                   "expr": "sum(vm_concurrent_insert_current{job=~\"$job\", instance=~\"$instance\"}) by (instance)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{instance}} - current",
+                  "legendFormat": "{{`{{`}}instance}} - current",
                   "range": true,
                   "refId": "B"
                 }
@@ -36499,7 +36499,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -36611,7 +36611,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -36723,7 +36723,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -36825,7 +36825,7 @@ data:
                   "exemplar": true,
                   "expr": "vm_snapshots{job=~\"$job\", instance=~\"$instance\"}",
                   "interval": "",
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -36969,7 +36969,7 @@ data:
                   },
                   "editorMode": "code",
                   "expr": "sum(rate(process_major_pagefaults_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (job,instance)",
-                  "legendFormat": "{{instance}} ({{job}})",
+                  "legendFormat": "{{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -37240,7 +37240,7 @@ data:
                   "exemplar": true,
                   "expr": "max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
                   "interval": "",
-                  "legendFormat": "{{instance}} ({{job}})",
+                  "legendFormat": "{{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -37346,7 +37346,7 @@ data:
                   "exemplar": true,
                   "expr": "max_over_time(process_resident_memory_anon_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
                   "interval": "",
-                  "legendFormat": "{{instance}} ({{job}})",
+                  "legendFormat": "{{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -37457,7 +37457,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{instance}}",
+                  "legendFormat": "{{`{{`}}instance}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -37564,7 +37564,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{instance}} ({{job}})",
+                  "legendFormat": "{{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -37669,7 +37669,7 @@ data:
                   "expr": "sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\", type=~\"indexdb.*\"}) by(job, instance)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}:{{instance}} (indexdb)",
+                  "legendFormat": "{{`{{`}}job}}:{{`{{`}}instance}} (indexdb)",
                   "range": true,
                   "refId": "A"
                 },
@@ -37682,7 +37682,7 @@ data:
                   "expr": "sum(vm_data_size_bytes{job=~\"$job\", instance=~\"$instance\", type!~\"indexdb.*\"}) by(job, instance)",
                   "format": "time_series",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}:{{instance}} (datapoints)",
+                  "legendFormat": "{{`{{`}}job}}:{{`{{`}}instance}} (datapoints)",
                   "range": true,
                   "refId": "B"
                 }
@@ -38088,7 +38088,7 @@ data:
             "hide": true,
             "iconColor": "dark-blue",
             "name": "version",
-            "textFormat": "{{short_version}}",
+            "textFormat": "{{`{{`}}short_version}}",
             "titleFormat": "Version change"
           },
           {
@@ -38101,7 +38101,7 @@ data:
             "hide": false,
             "iconColor": "dark-yellow",
             "name": "restarts",
-            "textFormat": "{{job}}:{{instance}} restarted"
+            "textFormat": "{{`{{`}}job}}:{{`{{`}}instance}} restarted"
           }
         ]
       },
@@ -39093,7 +39093,7 @@ data:
               "expr": "sum(rate({__name__=~\"vmagent_rows_inserted_total|vm_promscrape_scraped_samples_sum\", job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
               "hide": false,
               "interval": "",
-              "legendFormat": "in {{job}}",
+              "legendFormat": "in {{`{{`}}job}}",
               "range": true,
               "refId": "A"
             },
@@ -39105,7 +39105,7 @@ data:
               "editorMode": "code",
               "expr": "sum(rate(vmagent_remotewrite_block_size_rows_sum{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
               "interval": "",
-              "legendFormat": "out {{job}}",
+              "legendFormat": "out {{`{{`}}job}}",
               "range": true,
               "refId": "B"
             }
@@ -39232,7 +39232,7 @@ data:
               "exemplar": true,
               "expr": "sum(vmagent_remotewrite_pending_data_bytes{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}) by (job, url) > 2e6",
               "interval": "",
-              "legendFormat": "{{job}} => {{url}}",
+              "legendFormat": "{{`{{`}}job}} => {{`{{`}}url}}",
               "range": true,
               "refId": "A"
             }
@@ -39345,7 +39345,7 @@ data:
               "hide": false,
               "interval": "5m",
               "intervalFactor": 1,
-              "legendFormat": "{{job}} - {{level}}",
+              "legendFormat": "{{`{{`}}job}} - {{`{{`}}level}}",
               "range": true,
               "refId": "A"
             }
@@ -39459,7 +39459,7 @@ data:
               "editorMode": "code",
               "expr": "sum(rate(vm_persistentqueue_bytes_dropped_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (path) > 0",
               "interval": "",
-              "legendFormat": "{{ path }}",
+              "legendFormat": "{{`{{`}} path }}",
               "range": true,
               "refId": "A"
             }
@@ -39680,7 +39680,7 @@ data:
               "editorMode": "code",
               "expr": "sum(rate(vmagent_http_request_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, protocol) > 0",
               "interval": "",
-              "legendFormat": "requests:{{protocol}} ({{job}})",
+              "legendFormat": "requests:{{`{{`}}protocol}} ({{`{{`}}job}})",
               "range": true,
               "refId": "A"
             },
@@ -39692,7 +39692,7 @@ data:
               "editorMode": "code",
               "expr": "sum(rate(vm_protoparser_read_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type) > 0",
               "interval": "",
-              "legendFormat": "parse: {{type}} ({{job}})",
+              "legendFormat": "parse: {{`{{`}}type}} ({{`{{`}}job}})",
               "range": true,
               "refId": "B"
             },
@@ -39704,7 +39704,7 @@ data:
               "editorMode": "code",
               "expr": "sum(rate(vm_ingestserver_request_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type) > 0",
               "interval": "",
-              "legendFormat": "ingest: {{type}} ({{job}})",
+              "legendFormat": "ingest: {{`{{`}}type}} ({{`{{`}}job}})",
               "range": true,
               "refId": "C"
             },
@@ -39716,7 +39716,7 @@ data:
               "editorMode": "code",
               "expr": "sum(rate(vm_protoparser_unmarshal_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type) > 0",
               "interval": "",
-              "legendFormat": "unmarshal: {{type}} ({{job}})",
+              "legendFormat": "unmarshal: {{`{{`}}type}} ({{`{{`}}job}})",
               "range": true,
               "refId": "D"
             },
@@ -39728,7 +39728,7 @@ data:
               "editorMode": "code",
               "expr": "sum(rate(vm_promscrape_dial_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) > 0",
               "interval": "",
-              "legendFormat": "scrape dial ({{job}})",
+              "legendFormat": "scrape dial ({{`{{`}}job}})",
               "range": true,
               "refId": "E"
             }
@@ -40189,7 +40189,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - waiting",
+                  "legendFormat": "{{`{{`}}instance}} - waiting",
                   "range": true,
                   "refId": "A"
                 },
@@ -40204,7 +40204,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - stalled",
+                  "legendFormat": "{{`{{`}}instance}} - stalled",
                   "range": true,
                   "refId": "B"
                 }
@@ -40312,7 +40312,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - waiting",
+                  "legendFormat": "{{`{{`}}instance}} - waiting",
                   "range": true,
                   "refId": "A"
                 },
@@ -40327,7 +40327,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - stalled",
+                  "legendFormat": "{{`{{`}}instance}} - stalled",
                   "range": true,
                   "refId": "B"
                 }
@@ -40457,7 +40457,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "read {{job}}",
+                  "legendFormat": "read {{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -40472,7 +40472,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "write {{job}}",
+                  "legendFormat": "write {{`{{`}}job}}",
                   "range": true,
                   "refId": "B"
                 }
@@ -40689,7 +40689,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - waiting",
+                  "legendFormat": "{{`{{`}}instance}} - waiting",
                   "range": true,
                   "refId": "A"
                 },
@@ -40704,7 +40704,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - stalled",
+                  "legendFormat": "{{`{{`}}instance}} - stalled",
                   "range": true,
                   "refId": "B"
                 }
@@ -40933,7 +40933,7 @@ data:
                   "editorMode": "code",
                   "expr": "sum(rate(vm_tcplistener_read_bytes_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) * 8 \n+ sum(rate(vm_promscrape_conn_bytes_read_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) * 8",
                   "interval": "",
-                  "legendFormat": "in {{job}}",
+                  "legendFormat": "in {{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -40945,7 +40945,7 @@ data:
                   "editorMode": "code",
                   "expr": "sum(rate(vmagent_remotewrite_conn_bytes_written_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) * 8",
                   "interval": "",
-                  "legendFormat": "out {{job}}",
+                  "legendFormat": "out {{`{{`}}job}}",
                   "range": true,
                   "refId": "B"
                 }
@@ -41501,7 +41501,7 @@ data:
                   "exemplar": false,
                   "expr": "topk(10, sum(sum_over_time(scrape_series_added[5m])) by (job)) > 0",
                   "interval": "",
-                  "legendFormat": "{{ job }}",
+                  "legendFormat": "{{`{{`}} job }}",
                   "range": true,
                   "refId": "A"
                 }
@@ -42153,7 +42153,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(rate(vm_protoparser_rows_read_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type) > 0",
                   "interval": "",
-                  "legendFormat": "{{ type }} ({{job}})",
+                  "legendFormat": "{{`{{`}} type }} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -42259,7 +42259,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(rate(vm_rows_invalid_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type) > 0",
                   "interval": "",
-                  "legendFormat": "{{type}} ({{job}})",
+                  "legendFormat": "{{`{{`}}type}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -42496,7 +42496,7 @@ data:
                   "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) > 0) by(job)",
                   "format": "time_series",
                   "instant": false,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "refId": "A"
                 }
               ],
@@ -42723,7 +42723,7 @@ data:
                   "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"up\"}) by(job, type) > 0",
                   "format": "time_series",
                   "interval": "",
-                  "legendFormat": "{{type}} ({{job}})",
+                  "legendFormat": "{{`{{`}}type}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -42829,7 +42829,7 @@ data:
                   "expr": "sum(vm_promscrape_targets{job=~\"$job\", instance=~\"$instance\", status=\"down\"}) by(job, type) > 0",
                   "format": "time_series",
                   "interval": "",
-                  "legendFormat": "{{type}} ({{job}})",
+                  "legendFormat": "{{`{{`}}type}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -42937,7 +42937,7 @@ data:
                   "expr": "sum(vm_promscrape_scrape_pool_targets{job=~\"$job\", instance=~\"$instance\", status=\"up\"}) by(job, scrape_job) > 0",
                   "format": "time_series",
                   "interval": "",
-                  "legendFormat": "{{job}}: {{scrape_job}}",
+                  "legendFormat": "{{`{{`}}job}}: {{`{{`}}scrape_job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -43043,7 +43043,7 @@ data:
                   "expr": "sum(vm_promscrape_scrape_pool_targets{job=~\"$job\", instance=~\"$instance\", status=\"down\"}) by(job, scrape_job) > 0",
                   "format": "time_series",
                   "interval": "",
-                  "legendFormat": "{{job}}: {{scrape_job}}",
+                  "legendFormat": "{{`{{`}}job}}: {{`{{`}}scrape_job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -43569,7 +43569,7 @@ data:
                   "editorMode": "code",
                   "expr": "sum(rate(vm_promscrape_scrapes_failed_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) > 0",
                   "interval": "",
-                  "legendFormat": "scrapes failed ({{job}})",
+                  "legendFormat": "scrapes failed ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 },
@@ -43581,7 +43581,7 @@ data:
                   "editorMode": "code",
                   "expr": "sum(rate(vm_promscrape_scrapes_timed_out_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) > 0",
                   "interval": "",
-                  "legendFormat": "timeouts ({{job}})",
+                  "legendFormat": "timeouts ({{`{{`}}job}})",
                   "range": true,
                   "refId": "B"
                 },
@@ -43593,7 +43593,7 @@ data:
                   "editorMode": "code",
                   "expr": "sum(rate(vm_promscrape_scrapes_gunzip_failed_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) > 0",
                   "interval": "",
-                  "legendFormat": "gunzip fails ({{job}})",
+                  "legendFormat": "gunzip fails ({{`{{`}}job}})",
                   "range": true,
                   "refId": "C"
                 },
@@ -43605,7 +43605,7 @@ data:
                   "editorMode": "code",
                   "expr": "sum(rate(vm_promscrape_dial_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) > 0",
                   "interval": "",
-                  "legendFormat": "dial fails ({{job}})",
+                  "legendFormat": "dial fails ({{`{{`}}job}})",
                   "range": true,
                   "refId": "D"
                 },
@@ -43618,7 +43618,7 @@ data:
                   "expr": "sum(rate(vm_promscrape_max_scrape_size_exceeded_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job) > 0",
                   "hide": false,
                   "interval": "",
-                  "legendFormat": "max scrape size exceeded ({{job}})",
+                  "legendFormat": "max scrape size exceeded ({{`{{`}}job}})",
                   "range": true,
                   "refId": "E"
                 }
@@ -43736,7 +43736,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(rate(vm_ingestserver_requests_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type, net) > 0",
                   "interval": "",
-                  "legendFormat": "{{net}}: {{ type }} ({{job}})",
+                  "legendFormat": "{{`{{`}}net}}: {{`{{`}} type }} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 },
@@ -43749,7 +43749,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(rate(vmagent_http_requests_total{job=~\"$job\", instance=~\"$instance\", protocol!=\"\"}[$__rate_interval])) by(job, protocol) > 0",
                   "interval": "",
-                  "legendFormat": "{{ protocol }}: http ({{job}})",
+                  "legendFormat": "{{`{{`}} protocol }}: http ({{`{{`}}job}})",
                   "range": true,
                   "refId": "B"
                 }
@@ -43853,7 +43853,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(rate(vmagent_rows_inserted_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, type) > 0",
                   "interval": "",
-                  "legendFormat": "{{ type }} ({{job}})",
+                  "legendFormat": "{{`{{`}} type }} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -43957,7 +43957,7 @@ data:
                   "exemplar": true,
                   "expr": "max_over_time(vm_concurrent_insert_current{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
                   "interval": "",
-                  "legendFormat": "{{instance}} ({{job}})",
+                  "legendFormat": "{{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 },
@@ -43970,7 +43970,7 @@ data:
                   "exemplar": true,
                   "expr": "min(vm_concurrent_insert_capacity{job=~\"$job\", instance=~\"$instance\"}) by(job)",
                   "interval": "",
-                  "legendFormat": "limit ({{job}})",
+                  "legendFormat": "limit ({{`{{`}}job}})",
                   "range": true,
                   "refId": "B"
                 }
@@ -44073,7 +44073,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(rate(vm_ingestserver_request_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(type, net) > 0",
                   "interval": "",
-                  "legendFormat": "{{ type }} ({{net}})",
+                  "legendFormat": "{{`{{`}} type }} ({{`{{`}}net}})",
                   "refId": "A"
                 },
                 {
@@ -44084,7 +44084,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(rate(vmagent_http_request_errors_total{job=~\"$job\", instance=~\"$instance\", protocol!=\"\"}[$__rate_interval])) by(protocol) > 0",
                   "interval": "",
-                  "legendFormat": "{{ protocol }} (http)",
+                  "legendFormat": "{{`{{`}} protocol }} (http)",
                   "refId": "B"
                 }
               ],
@@ -44494,7 +44494,7 @@ data:
                   "editorMode": "code",
                   "expr": "increase(vm_streamaggr_flush_timeouts_total{job=~\"$job\",instance=~\"$instance\", url=~\"$url\"}[$__rate_interval]) > 0",
                   "instant": false,
-                  "legendFormat": "aggregation: {{url}} ({{job}}): {{path}}:{{position}}",
+                  "legendFormat": "aggregation: {{`{{`}}url}} ({{`{{`}}job}}): {{`{{`}}path}}:{{`{{`}}position}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -44507,7 +44507,7 @@ data:
                   "expr": "increase(vm_streamaggr_dedup_flush_timeouts_total{job=~\"$job\",instance=~\"$instance\", url=~\"$url\"}[$__rate_interval]) > 0",
                   "hide": false,
                   "instant": false,
-                  "legendFormat": "deduplication: {{url}} ({{job}}): {{path}}:{{position}}",
+                  "legendFormat": "deduplication: {{`{{`}}url}} ({{`{{`}}job}}): {{`{{`}}path}}:{{`{{`}}position}}",
                   "range": true,
                   "refId": "B"
                 }
@@ -44816,7 +44816,7 @@ data:
                   "expr": "max(vm_streamaggr_labels_compressor_items_count{job=~\"$job\",instance=~\"$instance\"}) by(job, instance)",
                   "hide": false,
                   "instant": false,
-                  "legendFormat": "items: {{instance}} ({{job}})",
+                  "legendFormat": "items: {{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 },
@@ -44829,7 +44829,7 @@ data:
                   "expr": "max(vm_streamaggr_labels_compressor_size_bytes{job=~\"$job\", instance=~\"$instance\"}) by(job, instance)",
                   "hide": false,
                   "instant": false,
-                  "legendFormat": "bytes: {{instance}} ({{job}})",
+                  "legendFormat": "bytes: {{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "B"
                 }
@@ -45379,7 +45379,7 @@ data:
                   "exemplar": true,
                   "expr": "max(\n  vmagent_hourly_series_limit_current_series{job=~\"$job\", instance=~\"$instance\"} \n  / \n  vmagent_hourly_series_limit_max_series{job=~\"$job\", instance=~\"$instance\"}\n  ) by(job) * 100",
                   "interval": "",
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -45590,7 +45590,7 @@ data:
                   "exemplar": true,
                   "expr": "max(\n  vmagent_daily_series_limit_current_series{job=~\"$job\",instance=~\"$instance\"} \n  / \n  vmagent_daily_series_limit_max_series{job=~\"$job\",instance=~\"$instance\"}\n) by(job)",
                   "interval": "",
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -45738,7 +45738,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{instance}} ({{job}})",
+                  "legendFormat": "{{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -45844,7 +45844,7 @@ data:
                   "exemplar": true,
                   "expr": "max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])",
                   "interval": "",
-                  "legendFormat": "{{instance}} ({{job}})",
+                  "legendFormat": "{{`{{`}}instance}} ({{`{{`}}job}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -45958,7 +45958,7 @@ data:
                   "exemplar": true,
                   "expr": "sum(vmagent_remotewrite_pending_data_bytes{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}) by (instance, url)",
                   "interval": "",
-                  "legendFormat": "{{instance}} => {{url}}",
+                  "legendFormat": "{{`{{`}}instance}} => {{`{{`}}url}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -46080,7 +46080,7 @@ data:
                   "expr": "sum(rate({__name__=~\"vm_promscrape_scraped_samples_sum|vmagent_rows_inserted_total\",job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, instance)",
                   "hide": false,
                   "interval": "",
-                  "legendFormat": "in {{instance}} {{job}}",
+                  "legendFormat": "in {{`{{`}}instance}} {{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -46092,7 +46092,7 @@ data:
                   "editorMode": "code",
                   "expr": "sum(rate(vmagent_remotewrite_block_size_rows_sum{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, instance)",
                   "interval": "",
-                  "legendFormat": "out {{instance}} {{job}}",
+                  "legendFormat": "out {{`{{`}}instance}} {{`{{`}}job}}",
                   "range": true,
                   "refId": "B"
                 }
@@ -46216,7 +46216,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "read {{instance}} {{job}}",
+                  "legendFormat": "read {{`{{`}}instance}} {{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -46231,7 +46231,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "write {{instance}} {{job}}",
+                  "legendFormat": "write {{`{{`}}instance}} {{`{{`}}job}}",
                   "range": true,
                   "refId": "B"
                 }
@@ -46347,7 +46347,7 @@ data:
                   "exemplar": true,
                   "expr": "(sum(vm_persistentqueue_free_disk_space_bytes{job=~\"$job\", instance=~\"$instance\"}) by (job, instance, path))\n/\n(sum(deriv(vm_persistentqueue_bytes_pending{job=~\"$job\", instance=~\"$instance\"}[1m])) by (job, instance, path) > 0)\n* on(job, instance, path) group_left(url)\n(vmagent_remotewrite_pending_data_bytes{job=~\"$job\", instance=~\"$instance\", url=~\"$url\"}*0 + 1)",
                   "interval": "",
-                  "legendFormat": "{{instance}} => {{url}}",
+                  "legendFormat": "{{`{{`}}instance}} => {{`{{`}}url}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -46516,7 +46516,7 @@ data:
             "hide": true,
             "iconColor": "dark-blue",
             "name": "version",
-            "textFormat": "{{short_version}}",
+            "textFormat": "{{`{{`}}short_version}}",
             "titleFormat": "Version change"
           },
           {
@@ -46529,7 +46529,7 @@ data:
             "hide": false,
             "iconColor": "dark-yellow",
             "name": "restarts",
-            "textFormat": "{{job}}:{{instance}} restarted"
+            "textFormat": "{{`{{`}}job}}:{{`{{`}}instance}} restarted"
           }
         ]
       },
@@ -47162,7 +47162,7 @@ data:
               "format": "time_series",
               "instant": false,
               "interval": "",
-              "legendFormat": "{{job}}",
+              "legendFormat": "{{`{{`}}job}}",
               "refId": "A"
             }
           ],
@@ -47280,7 +47280,7 @@ data:
               "exemplar": false,
               "expr": "sum(increase(vmalert_alerts_fired_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job)",
               "interval": "",
-              "legendFormat": "{{job}}",
+              "legendFormat": "{{`{{`}}job}}",
               "range": true,
               "refId": "A"
             }
@@ -47386,7 +47386,7 @@ data:
               "exemplar": false,
               "expr": "topk($topk, max(sum(\n    rate(vmalert_iteration_duration_seconds_sum{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}[$__rate_interval])\n/\n    rate(vmalert_iteration_duration_seconds_count{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}[$__rate_interval])\n) by(job, instance, group, file)) \nby(job, group, file))",
               "interval": "",
-              "legendFormat": "({{job}}) {{group}}({{file}})",
+              "legendFormat": "({{`{{`}}job}}) {{`{{`}}group}}({{`{{`}}file}})",
               "range": true,
               "refId": "A"
             }
@@ -47490,7 +47490,7 @@ data:
               "exemplar": false,
               "expr": "sum(rate(vmalert_execution_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by (job)",
               "interval": "",
-              "legendFormat": "{{job}}",
+              "legendFormat": "{{`{{`}}job}}",
               "range": true,
               "refId": "A"
             }
@@ -47836,7 +47836,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -48061,7 +48061,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 },
@@ -48077,7 +48077,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 1,
-                  "legendFormat": "limit ({{job}})",
+                  "legendFormat": "limit ({{`{{`}}job}})",
                   "range": true,
                   "refId": "B"
                 }
@@ -48192,7 +48192,7 @@ data:
                   "exemplar": false,
                   "expr": "max(\n    max_over_time(process_resident_memory_bytes{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])\n) by(job)",
                   "interval": "",
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -48298,7 +48298,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - waiting",
+                  "legendFormat": "{{`{{`}}instance}} - waiting",
                   "range": true,
                   "refId": "A"
                 },
@@ -48313,7 +48313,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - stalled",
+                  "legendFormat": "{{`{{`}}instance}} - stalled",
                   "range": true,
                   "refId": "B"
                 }
@@ -48419,7 +48419,7 @@ data:
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - waiting",
+                  "legendFormat": "{{`{{`}}instance}} - waiting",
                   "range": true,
                   "refId": "A"
                 },
@@ -48434,7 +48434,7 @@ data:
                   "hide": false,
                   "interval": "",
                   "intervalFactor": 2,
-                  "legendFormat": "{{instance}} - stalled",
+                  "legendFormat": "{{`{{`}}instance}} - stalled",
                   "range": true,
                   "refId": "B"
                 }
@@ -49219,7 +49219,7 @@ data:
                   "exemplar": false,
                   "expr": "sum(increase(vmalert_iteration_missed_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, group, file) > 0",
                   "interval": "1m",
-                  "legendFormat": "({{job}}) {{group}}({{file}})",
+                  "legendFormat": "({{`{{`}}job}}) {{`{{`}}group}}({{`{{`}}file}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -49324,7 +49324,7 @@ data:
                   "expr": "sum(changes(vm_app_start_timestamp{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval]) > 0) by(job)",
                   "format": "time_series",
                   "instant": false,
-                  "legendFormat": "{{job}}",
+                  "legendFormat": "{{`{{`}}job}}",
                   "refId": "A"
                 }
               ],
@@ -49439,7 +49439,7 @@ data:
                   "exemplar": false,
                   "expr": "topk($topk, sum(vmalert_alerts_firing{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}) by(job, group, file, alertname) > 0)",
                   "interval": "",
-                  "legendFormat": "({{job}}) {{group}}.{{alertname}}({{file}})",
+                  "legendFormat": "({{`{{`}}job}}) {{`{{`}}group}}.{{`{{`}}alertname}}({{`{{`}}file}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -49541,7 +49541,7 @@ data:
                   "exemplar": false,
                   "expr": "sum(increase(vmalert_alerting_rules_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}[$__rate_interval])) by(job, group, file, alertname) > 0",
                   "interval": "",
-                  "legendFormat": "({{job}}) {{group}}.{{alertname}}({{file}})",
+                  "legendFormat": "({{`{{`}}job}}) {{`{{`}}group}}.{{`{{`}}alertname}}({{`{{`}}file}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -49643,7 +49643,7 @@ data:
                   "exemplar": false,
                   "expr": "sum(vmalert_alerts_pending{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}) by(job, group, file, alertname) > 0",
                   "interval": "",
-                  "legendFormat": "({{job}}) {{group}}.{{alertname}}({{file}})",
+                  "legendFormat": "({{`{{`}}job}}) {{`{{`}}group}}.{{`{{`}}alertname}}({{`{{`}}file}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -49743,7 +49743,7 @@ data:
                   "exemplar": false,
                   "expr": "sum(rate(vmalert_alerts_send_errors_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(instance, addr) > 0",
                   "interval": "",
-                  "legendFormat": "{{instance}} => {{addr}}",
+                  "legendFormat": "{{`{{`}}instance}} => {{`{{`}}addr}}",
                   "refId": "A"
                 }
               ],
@@ -49843,7 +49843,7 @@ data:
                   "exemplar": false,
                   "expr": "sum(rate(vmalert_alerts_sent_total{job=~\"$job\", instance=~\"$instance\"}[$__rate_interval])) by(job, addr) > 0",
                   "interval": "",
-                  "legendFormat": "{{job}} => {{addr}}",
+                  "legendFormat": "{{`{{`}}job}} => {{`{{`}}addr}}",
                   "range": true,
                   "refId": "A"
                 }
@@ -49959,7 +49959,7 @@ data:
                   "exemplar": false,
                   "expr": "topk($topk, \n  max(\n    sum(vmalert_recording_rules_last_evaluation_samples{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}) by(job, instance, group, file, recording) > 0\n  ) by(job, group, file, recording)\n)",
                   "interval": "",
-                  "legendFormat": "({{job}}) {{group}}.{{recording}}({{file}})",
+                  "legendFormat": "({{`{{`}}job}}) {{`{{`}}group}}.{{`{{`}}recording}}({{`{{`}}file}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -50061,7 +50061,7 @@ data:
                   "exemplar": false,
                   "expr": "count(vmalert_recording_rules_last_evaluation_samples{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"} < 1) by(job, group, file, recording)",
                   "interval": "",
-                  "legendFormat": "({{job}}) {{group}}.{{recording}}({{file}})",
+                  "legendFormat": "({{`{{`}}job}}) {{`{{`}}group}}.{{`{{`}}recording}}({{`{{`}}file}})",
                   "range": true,
                   "refId": "A"
                 }
@@ -50160,7 +50160,7 @@ data:
                   "exemplar": false,
                   "expr": "sum(increase(vmalert_recording_rules_errors_total{job=~\"$job\", instance=~\"$instance\", group=~\"$group\", file=~\"$file\"}[$__rate_interval])) by(job, group, file, recording) > 0",
                   "interval": "",
-                  "legendFormat": "({{job}}) {{group}}.{{recording}}({{file}})",
+                  "legendFormat": "({{`{{`}}job}}) {{`{{`}}group}}.{{`{{`}}recording}}({{`{{`}}file}})",
                   "range": true,
                   "refId": "A"
                 }
