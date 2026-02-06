@@ -354,7 +354,7 @@ data:
     // --------------------------------------------------------------------------
     // Relabel: Fix job names for dashboard compatibility
     // Alloy uses component names as job labels (e.g., prometheus.scrape.apiserver)
-    // Dashboards from Grafana.com (dotdc) expect integrations/* naming pattern
+    // Dashboards expect simple names (e.g., apiserver, coredns)
     // --------------------------------------------------------------------------
     prometheus.relabel "fix_job_labels" {
       forward_to = [prometheus.remote_write.victoriametrics.receiver]
@@ -363,56 +363,49 @@ data:
         source_labels = ["job"]
         regex         = "prometheus\\.scrape\\.apiserver"
         target_label  = "job"
-        replacement   = "integrations/kubernetes/apiserver"
+        replacement   = "apiserver"
       }
 
       rule {
         source_labels = ["job"]
         regex         = "prometheus\\.scrape\\.coredns"
         target_label  = "job"
-        replacement   = "integrations/kubernetes/coredns"
+        replacement   = "coredns"
       }
 
       rule {
         source_labels = ["job"]
         regex         = "prometheus\\.scrape\\.kubelet"
         target_label  = "job"
-        replacement   = "integrations/kubernetes/kubelet"
+        replacement   = "kubelet"
       }
 
       rule {
         source_labels = ["job"]
         regex         = "prometheus\\.scrape\\.cadvisor"
         target_label  = "job"
-        replacement   = "integrations/kubernetes/cadvisor"
+        replacement   = "cadvisor"
       }
 
       rule {
         source_labels = ["job"]
         regex         = "prometheus\\.scrape\\.kube_state_metrics"
         target_label  = "job"
-        replacement   = "integrations/kubernetes/kube-state-metrics"
+        replacement   = "kube-state-metrics"
       }
 
       rule {
         source_labels = ["job"]
         regex         = "prometheus\\.scrape\\.node_exporter"
         target_label  = "job"
-        replacement   = "integrations/node_exporter"
+        replacement   = "node-exporter"
       }
 
       rule {
         source_labels = ["job"]
         regex         = "prometheus\\.scrape\\.pods"
         target_label  = "job"
-        replacement   = "integrations/kubernetes/pods"
-      }
-
-      rule {
-        source_labels = ["job"]
-        regex         = "prometheus\\.scrape\\.alloy_self"
-        target_label  = "job"
-        replacement   = "integrations/alloy"
+        replacement   = "kubernetes-pods"
       }
     }
 
