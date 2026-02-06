@@ -126,6 +126,27 @@ spec:
     id: 15760  # Kubernetes / Views / Pods
     revision: 30
 ---
+# Kubernetes / System / API Server
+# Note: Not included in kubernetes-mixin, added separately
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-k8s-apiserver
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  grafanaCom:
+    id: 15761  # Kubernetes / System / API Server
+    revision: 17
+---
 # Kubernetes / System / CoreDNS
 # Note: Not included in kubernetes-mixin, added separately
 apiVersion: grafana.integreatly.org/v1beta1
