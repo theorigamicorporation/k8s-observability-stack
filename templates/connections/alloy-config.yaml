@@ -117,7 +117,7 @@ data:
     // --------------------------------------------------------------------------
     prometheus.scrape "pods" {
       targets    = discovery.relabel.pod_metrics.output
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scrape_interval = "{{ .Values.serviceMonitor.interval | default "30s" }}"
       scrape_timeout  = "{{ .Values.serviceMonitor.scrapeTimeout | default "10s" }}"
@@ -149,7 +149,7 @@ data:
 
     prometheus.scrape "kubelet" {
       targets    = discovery.relabel.kubelet.output
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scheme          = "https"
       tls_config {
@@ -190,7 +190,7 @@ data:
 
     prometheus.scrape "cadvisor" {
       targets    = discovery.relabel.cadvisor.output
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scheme = "https"
       tls_config {
@@ -214,7 +214,7 @@ data:
       targets = [
         {"__address__" = "{{ .Release.Name }}-kube-state-metrics:8080"},
       ]
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scrape_interval = "30s"
 
@@ -232,7 +232,7 @@ data:
       targets = [
         {"__address__" = "kubernetes.default.svc:443"},
       ]
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scheme = "https"
       metrics_path = "/metrics"
@@ -282,7 +282,7 @@ data:
 
     prometheus.scrape "coredns" {
       targets    = discovery.relabel.coredns.output
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scrape_interval = "30s"
     }
@@ -346,9 +346,67 @@ data:
 
     prometheus.scrape "node_exporter" {
       targets    = prometheus.exporter.unix.node.targets
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Relabel: Fix job names for dashboard compatibility
+    // Alloy uses component names as job labels (e.g., prometheus.scrape.apiserver)
+    // Dashboards expect simple names (e.g., apiserver, coredns)
+    // --------------------------------------------------------------------------
+    prometheus.relabel "fix_job_labels" {
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.apiserver"
+        target_label  = "job"
+        replacement   = "apiserver"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.coredns"
+        target_label  = "job"
+        replacement   = "coredns"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.kubelet"
+        target_label  = "job"
+        replacement   = "kubelet"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.cadvisor"
+        target_label  = "job"
+        replacement   = "cadvisor"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.kube_state_metrics"
+        target_label  = "job"
+        replacement   = "kube-state-metrics"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.node_exporter"
+        target_label  = "job"
+        replacement   = "node-exporter"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.pods"
+        target_label  = "job"
+        replacement   = "kubernetes-pods"
+      }
     }
 
     // --------------------------------------------------------------------------
@@ -476,7 +534,7 @@ data:
 
     prometheus.scrape "alloy_self" {
       targets    = prometheus.exporter.self.alloy.targets
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scrape_interval = "30s"
     }
