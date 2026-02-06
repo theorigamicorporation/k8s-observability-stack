@@ -821,7 +821,9 @@ kiali:
 # Dashboard and alert rule generation from community mixins
 mixins:
   # Enable mixin-based dashboards and alerts
-  enabled: true
+  # Note: Disabled by default due to 3MB Helm release size limit
+  # Use 'helm template | kubectl apply' if enabling mixins
+  enabled: false
   
   # Kubernetes mixin (kubernetes-mixin)
   kubernetes:
