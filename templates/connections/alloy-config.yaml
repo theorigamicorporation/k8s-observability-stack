@@ -74,7 +74,7 @@ data:
         source_labels = ["__meta_kubernetes_pod_ip", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
         regex         = "(.+);(\\d+)"
         target_label  = "__address__"
-        replacement   = "$${1}:$${2}"
+        replacement   = "$1:$2"
         action        = "replace"
       }
 
@@ -138,7 +138,7 @@ data:
         source_labels = ["__meta_kubernetes_node_name"]
         regex         = "(.+)"
         target_label  = "__metrics_path__"
-        replacement   = "/api/v1/nodes/$${1}/proxy/metrics"
+        replacement   = "/api/v1/nodes/$1/proxy/metrics"
       }
 
       rule {
@@ -179,7 +179,7 @@ data:
         source_labels = ["__meta_kubernetes_node_name"]
         regex         = "(.+)"
         target_label  = "__metrics_path__"
-        replacement   = "/api/v1/nodes/$${1}/proxy/metrics/cadvisor"
+        replacement   = "/api/v1/nodes/$1/proxy/metrics/cadvisor"
       }
 
       rule {
@@ -266,7 +266,7 @@ data:
         source_labels = ["__meta_kubernetes_pod_ip"]
         regex         = "(.+)"
         target_label  = "__address__"
-        replacement   = "$${1}:9153"
+        replacement   = "$1:9153"
       }
 
       rule {
