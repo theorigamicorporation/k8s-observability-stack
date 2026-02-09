@@ -422,8 +422,10 @@ vmsingle:
       dedup.minScrapeInterval: 30s
     
     # Scrape configuration
+    # Disabled: Alloy is the sole scraper. VMSingle's built-in scraping creates
+    # duplicate metrics without the cluster label, breaking dashboard filters.
     scrape:
-      enabled: true
+      enabled: false
       configMap: ""
   
   # Disable alertmanager in subchart (we use standalone)

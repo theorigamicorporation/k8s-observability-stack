@@ -407,6 +407,20 @@ data:
         target_label  = "job"
         replacement   = "kubernetes-pods"
       }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.victoriametrics"
+        target_label  = "job"
+        replacement   = "victoriametrics"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.alloy_self"
+        target_label  = "job"
+        replacement   = "alloy"
+      }
     }
 
     // --------------------------------------------------------------------------
@@ -536,6 +550,20 @@ data:
       targets    = prometheus.exporter.self.alloy.targets
       forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: VictoriaMetrics Self-Monitoring
+    // Replaces VMSingle's built-in self-scrape (disabled via scrape.enabled=false)
+    // --------------------------------------------------------------------------
+    prometheus.scrape "victoriametrics" {
+      targets = [
+        {"__address__" = "{{ .Release.Name }}-vmsingle-server:8428"},
+      ]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
+
+      metrics_path    = "/metrics"
       scrape_interval = "30s"
     }
 {{- end }}

@@ -1,0 +1,39 @@
+{{- if .Values.alloy.enabled }}
+{{/*
+Supplementary RBAC for Alloy
+The Alloy subchart creates its own ClusterRole with basic permissions
+(nodes, nodes/pods, nodes/metrics, /metrics). This supplementary
+ClusterRole adds nodes/proxy, required for kubelet and cadvisor
+scraping via the Kubernetes API server proxy path:
+  /api/v1/nodes/{node}/proxy/metrics
+  /api/v1/nodes/{node}/proxy/metrics/cadvisor
+*/}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "k8s-observability-stack.fullname" . }}-alloy-proxy
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: alloy-rbac
+rules:
+  - apiGroups: [""]
+    resources: ["nodes/proxy"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "k8s-observability-stack.fullname" . }}-alloy-proxy
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: alloy-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "k8s-observability-stack.fullname" . }}-alloy-proxy
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Release.Name }}-alloy
+    namespace: {{ include "k8s-observability-stack.namespace" . }}
+{{- end }}
