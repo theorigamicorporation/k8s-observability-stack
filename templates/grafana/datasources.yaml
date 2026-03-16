@@ -36,6 +36,42 @@ spec:
 {{- end }}
 
 {{/*
+Prometheus Datasource (alias for VictoriaMetrics for dashboard compatibility)
+*/}}
+{{- if .Values.grafana.datasources.victoriametrics.enabled }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: {{ include "k8s-observability-stack.datasourcePrefix" . }}-prometheus
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-datasource
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  datasource:
+    name: Prometheus
+    type: prometheus
+    access: proxy
+    {{- if .Values.grafana.datasources.victoriametrics.url }}
+    url: {{ .Values.grafana.datasources.victoriametrics.url }}
+    {{- else }}
+    url: {{ include "k8s-observability-stack.vmQueryUrl" . }}
+    {{- end }}
+    isDefault: false
+    editable: false
+    jsonData:
+      httpMethod: POST
+      timeInterval: "30s"
+      prometheusType: Prometheus
+      prometheusVersion: "2.40.0"
+{{- end }}
+
+{{/*
 Loki Datasource
 */}}
 {{- if and .Values.loki.enabled .Values.grafana.datasources.loki.enabled }}

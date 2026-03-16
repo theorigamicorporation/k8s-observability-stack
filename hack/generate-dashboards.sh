@@ -172,33 +172,56 @@ download_loki_dashboards() {
     log_info "Loki dashboards downloaded."
 }
 
-# Generate dashboard ConfigMaps for Helm
+# Generate dashboard ConfigMaps and GrafanaDashboard CRs for Helm
 generate_configmaps() {
-    log_info "Generating dashboard ConfigMaps..."
-    
-    local output_file="${ROOT_DIR}/templates/grafana/dashboard-configmaps.yaml"
-    
-    cat > "${output_file}" << 'EOF'
-{{- if and (index .Values "grafana-operator" "enabled") .Values.grafana.instance.enabled .Values.grafana.dashboards.enabled }}
+    log_info "Generating dashboard ConfigMaps and GrafanaDashboard CRs..."
+
+    local configmap_file="${ROOT_DIR}/templates/grafana/mixin-dashboard-configmaps.yaml"
+    local dashboard_file="${ROOT_DIR}/templates/grafana/mixin-dashboards.yaml"
+
+    # Header for ConfigMaps file
+    cat > "${configmap_file}" << 'EOF'
+{{- if and (index .Values "grafana-operator" "enabled") .Values.grafana.instance.enabled .Values.grafana.dashboards.enabled .Values.mixins.enabled }}
 {{/*
 Dashboard ConfigMaps generated from mixins
 These are created by hack/generate-dashboards.sh
+DO NOT EDIT - regenerate with: make sync-mixins
+*/}}
+EOF
+
+    # Header for GrafanaDashboard CRs file
+    cat > "${dashboard_file}" << 'EOF'
+{{- if and (index .Values "grafana-operator" "enabled") .Values.grafana.instance.enabled .Values.grafana.dashboards.enabled .Values.mixins.enabled }}
+{{/*
+GrafanaDashboard CRs generated from mixins
+These reference ConfigMaps created by the same script
+DO NOT EDIT - regenerate with: make sync-mixins
 */}}
 EOF
 
     # Find all dashboard JSON files
-    find "${DASHBOARDS_DIR}" -name "*.json" -type f | while read -r dashboard_file; do
-        local relative_path="${dashboard_file#${DASHBOARDS_DIR}/}"
+    find "${DASHBOARDS_DIR}" -name "*.json" -type f | sort | while read -r json_file; do
+        local relative_path="${json_file#${DASHBOARDS_DIR}/}"
         local category=$(dirname "${relative_path}")
-        local filename=$(basename "${dashboard_file}" .json)
+        local filename=$(basename "${json_file}" .json)
         local safe_name=$(echo "${filename}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
-        
-        cat >> "${output_file}" << EOF
+
+        # Determine folder based on category
+        local folder_suffix="kubernetes"
+        case "${category}" in
+            node-exporter) folder_suffix="kubernetes" ;;
+            victoriametrics) folder_suffix="victoriametrics" ;;
+            loki) folder_suffix="kubernetes" ;;
+            *) folder_suffix="kubernetes" ;;
+        esac
+
+        # Generate ConfigMap
+        cat >> "${configmap_file}" << EOF
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-${safe_name}
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-${safe_name}
   namespace: {{ include "k8s-observability-stack.namespace" . }}
   labels:
     {{- include "k8s-observability-stack.labels" . | nindent 4 }}
@@ -207,14 +230,39 @@ metadata:
 data:
   ${filename}.json: |
 EOF
-        # Indent the JSON content
-        sed 's/^/    /' "${dashboard_file}" >> "${output_file}"
-        echo "" >> "${output_file}"
+        # Indent the JSON content and escape Helm template syntax
+        sed 's/{{/{{`{{`}}/g' "${json_file}" | sed 's/^/    /' >> "${configmap_file}"
+        echo "" >> "${configmap_file}"
+
+        # Generate GrafanaDashboard CR
+        cat >> "${dashboard_file}" << EOF
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-${safe_name}
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: ${category}
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-${folder_suffix}
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-${safe_name}
+    key: ${filename}.json
+EOF
     done
-    
-    echo '{{- end }}' >> "${output_file}"
-    
-    log_info "Dashboard ConfigMaps generated at templates/grafana/dashboard-configmaps.yaml"
+
+    echo '{{- end }}' >> "${configmap_file}"
+    echo '{{- end }}' >> "${dashboard_file}"
+
+    log_info "Dashboard ConfigMaps generated at templates/grafana/mixin-dashboard-configmaps.yaml"
+    log_info "GrafanaDashboard CRs generated at templates/grafana/mixin-dashboards.yaml"
 }
 
 # Create index file

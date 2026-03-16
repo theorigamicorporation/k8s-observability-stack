@@ -101,23 +101,25 @@ false
 
 {{/*
 Get VictoriaMetrics write URL based on mode
+Note: Subcharts use Release.Name as prefix, not fullname
 */}}
 {{- define "k8s-observability-stack.vmWriteUrl" -}}
 {{- if eq .Values.victoriametrics.mode "cluster" -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-vmcluster-vminsert:8480/insert/0/prometheus/api/v1/write
+http://{{ .Release.Name }}-vmcluster-vminsert:8480/insert/0/prometheus/api/v1/write
 {{- else -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-vmsingle-server:8428/api/v1/write
+http://{{ .Release.Name }}-vmsingle-server:8428/api/v1/write
 {{- end -}}
 {{- end }}
 
 {{/*
 Get VictoriaMetrics read/query URL based on mode
+Note: Subcharts use Release.Name as prefix, not fullname
 */}}
 {{- define "k8s-observability-stack.vmQueryUrl" -}}
 {{- if eq .Values.victoriametrics.mode "cluster" -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-vmcluster-vmselect:8481/select/0/prometheus
+http://{{ .Release.Name }}-vmcluster-vmselect:8481/select/0/prometheus
 {{- else -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-vmsingle-server:8428
+http://{{ .Release.Name }}-vmsingle-server:8428
 {{- end -}}
 {{- end }}
 
@@ -160,12 +162,13 @@ false
 
 {{/*
 Get VictoriaTraces URL based on mode
+Note: Subcharts use Release.Name as prefix, not fullname
 */}}
 {{- define "k8s-observability-stack.vtUrl" -}}
 {{- if eq .Values.victoriatraces.mode "cluster" -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-vtcluster:9411
+http://{{ .Release.Name }}-vtcluster:9411
 {{- else -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-vtsingle-server:9411
+http://{{ .Release.Name }}-vtsingle-server:9411
 {{- end -}}
 {{- end }}
 
@@ -180,23 +183,25 @@ Get Loki URL
 {{- if .Values.grafana.datasources.loki.url -}}
 {{ .Values.grafana.datasources.loki.url }}
 {{- else -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-loki:3100
+http://{{ .Release.Name }}-loki:3100
 {{- end -}}
 {{- end }}
 
 {{/*
 Get Grafana URL
+Note: Grafana operator creates service as <instance-name>-service
 */}}
 {{- define "k8s-observability-stack.grafanaUrl" -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-grafana:3000
+http://{{ include "k8s-observability-stack.grafanaInstanceName" . }}-service:3000
 {{- end }}
 
 {{/*
 Get Alertmanager URL
+Note: Subcharts use Release.Name as prefix, not fullname
 */}}
 {{- define "k8s-observability-stack.alertmanagerUrl" -}}
 {{- if .Values.alertmanager.enabled -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-alertmanager:9093
+http://{{ .Release.Name }}-alertmanager:9093
 {{- else -}}
 ""
 {{- end -}}
@@ -204,10 +209,11 @@ http://{{ include "k8s-observability-stack.fullname" . }}-alertmanager:9093
 
 {{/*
 Get Jaeger URL
+Note: Subcharts use Release.Name as prefix, not fullname
 */}}
 {{- define "k8s-observability-stack.jaegerUrl" -}}
 {{- if .Values.jaeger.enabled -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-jaeger-query:16686
+http://{{ .Release.Name }}-jaeger-query:16686
 {{- else -}}
 ""
 {{- end -}}
@@ -230,10 +236,11 @@ Get tracing URL (VictoriaTraces or Jaeger, depending on what's enabled)
 
 {{/*
 Get kube-state-metrics URL
+Note: Subcharts use Release.Name as prefix, not fullname
 */}}
 {{- define "k8s-observability-stack.ksmUrl" -}}
 {{- if index .Values "kube-state-metrics" "enabled" -}}
-http://{{ include "k8s-observability-stack.fullname" . }}-kube-state-metrics:8080
+http://{{ .Release.Name }}-kube-state-metrics:8080
 {{- else -}}
 ""
 {{- end -}}
@@ -269,10 +276,10 @@ VMAlert name
 {{- end }}
 
 {{/*
-Alloy ConfigMap name
+Alloy ConfigMap name - must match what alloy subchart expects
 */}}
 {{- define "k8s-observability-stack.alloyConfigName" -}}
-{{ include "k8s-observability-stack.fullname" . }}-alloy-config
+{{ .Release.Name }}-alloy
 {{- end }}
 
 {{/* ==========================================================================

@@ -11,21 +11,31 @@
 global:
   # Cluster name used for labeling and identification
   clusterName: ""
-  
+
   # Default storage class for all persistent volumes
   storageClass: ""
-  
+
   # Common labels applied to all resources
   commonLabels: {}
-  
+
   # Common annotations applied to all resources
   commonAnnotations: {}
-  
+
   # Image pull secrets for private registries
   imagePullSecrets: []
-  
+
   # Priority class name for all pods
   priorityClassName: ""
+
+  # Allow non-Bitnami images (required for kube-state-metrics official image)
+  security:
+    allowInsecureImages: true
+
+# -----------------------------------------------------------------------------
+# Prometheus Operator CRDs (ServiceMonitor, PodMonitor, PrometheusRule, etc.)
+# -----------------------------------------------------------------------------
+crds:
+  enabled: true
 
 # -----------------------------------------------------------------------------
 # Grafana Operator Configuration
@@ -253,6 +263,7 @@ loki:
       retention_enabled: true
       retention_delete_delay: 2h
       retention_delete_worker_count: 150
+      delete_request_store: filesystem
   
   # Single binary mode settings (for SingleBinary deploymentMode)
   singleBinary:
@@ -411,8 +422,10 @@ vmsingle:
       dedup.minScrapeInterval: 30s
     
     # Scrape configuration
+    # Disabled: Alloy is the sole scraper. VMSingle's built-in scraping creates
+    # duplicate metrics without the cluster label, breaking dashboard filters.
     scrape:
-      enabled: true
+      enabled: false
       configMap: ""
   
   # Disable alertmanager in subchart (we use standalone)
@@ -489,11 +502,18 @@ vmalert:
 # -----------------------------------------------------------------------------
 # Kubernetes state metrics exporter
 kube-state-metrics:
-  enabled: false
-  
+  enabled: true
+
   # All kube-state-metrics chart values can be configured here
   # See: https://artifacthub.io/packages/helm/bitnami/kube-state-metrics
-  
+
+  # Use official kube-state-metrics image (more reliable than Bitnami default)
+  # https://github.com/kubernetes/kube-state-metrics/releases
+  image:
+    registry: registry.k8s.io
+    repository: kube-state-metrics/kube-state-metrics
+    tag: v2.18.0
+
   # Resource requirements
   resources:
     requests:
@@ -803,7 +823,9 @@ kiali:
 # Dashboard and alert rule generation from community mixins
 mixins:
   # Enable mixin-based dashboards and alerts
-  enabled: true
+  # Note: Disabled by default due to 3MB Helm release size limit
+  # Use 'helm template | kubectl apply' if enabling mixins
+  enabled: false
   
   # Kubernetes mixin (kubernetes-mixin)
   kubernetes:

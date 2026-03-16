@@ -37,6 +37,14 @@ annotations:
 
 dependencies:
   # =============================================================================
+  # Prometheus Operator CRDs (ServiceMonitor, PodMonitor, PrometheusRule, etc.)
+  # Must be installed before any component that creates ServiceMonitors
+  # =============================================================================
+  - name: crds
+    version: "0.0.0"
+    condition: crds.enabled
+
+  # =============================================================================
   # Core Components - Always enabled by default
   # =============================================================================
   

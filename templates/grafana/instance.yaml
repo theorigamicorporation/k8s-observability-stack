@@ -13,12 +13,11 @@ metadata:
     {{- . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with .Values.grafana.instance.replicas }}
-  replicas: {{ . }}
-  {{- end }}
-  
   deployment:
     spec:
+      {{- with .Values.grafana.instance.replicas }}
+      replicas: {{ . }}
+      {{- end }}
       template:
         spec:
           {{- with .Values.grafana.instance.nodeSelector }}
@@ -70,9 +69,9 @@ spec:
       disable_login_form: "false"
     security:
       admin_user: {{ .Values.grafana.instance.adminCredentials.username | default "admin" | quote }}
-      admin_password: ${ADMIN_PASSWORD}
     server:
       root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+      serve_from_sub_path: "true"
     dashboards:
       default_home_dashboard_path: "/tmp/dashboards/kubernetes-overview.json"
     
@@ -118,14 +117,4 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   {{- end }}
-
-  secrets:
-    {{- if .Values.grafana.instance.adminCredentials.existingSecret }}
-    - {{ .Values.grafana.instance.adminCredentials.existingSecret }}
-    {{- else }}
-    - {{ include "k8s-observability-stack.grafanaAdminSecretName" . }}
-    {{- end }}
-    {{- with .Values.grafana.instance.additionalSecrets }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
 {{- end }}

@@ -69,12 +69,12 @@ data:
         action        = "keep"
       }
 
-      // Use custom port if specified
+      // Build address from pod IP and custom port if specified
       rule {
-        source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_port"]
-        regex         = "(\\d+)"
+        source_labels = ["__meta_kubernetes_pod_ip", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
+        regex         = "(.+);(\\d+)"
         target_label  = "__address__"
-        replacement   = "$${1}:$${2}"
+        replacement   = "$1:$2"
         action        = "replace"
       }
 
@@ -117,7 +117,7 @@ data:
     // --------------------------------------------------------------------------
     prometheus.scrape "pods" {
       targets    = discovery.relabel.pod_metrics.output
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scrape_interval = "{{ .Values.serviceMonitor.interval | default "30s" }}"
       scrape_timeout  = "{{ .Values.serviceMonitor.scrapeTimeout | default "10s" }}"
@@ -138,7 +138,7 @@ data:
         source_labels = ["__meta_kubernetes_node_name"]
         regex         = "(.+)"
         target_label  = "__metrics_path__"
-        replacement   = "/api/v1/nodes/$${1}/proxy/metrics"
+        replacement   = "/api/v1/nodes/$1/proxy/metrics"
       }
 
       rule {
@@ -149,7 +149,7 @@ data:
 
     prometheus.scrape "kubelet" {
       targets    = discovery.relabel.kubelet.output
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scheme          = "https"
       tls_config {
@@ -179,7 +179,7 @@ data:
         source_labels = ["__meta_kubernetes_node_name"]
         regex         = "(.+)"
         target_label  = "__metrics_path__"
-        replacement   = "/api/v1/nodes/$${1}/proxy/metrics/cadvisor"
+        replacement   = "/api/v1/nodes/$1/proxy/metrics/cadvisor"
       }
 
       rule {
@@ -190,7 +190,7 @@ data:
 
     prometheus.scrape "cadvisor" {
       targets    = discovery.relabel.cadvisor.output
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scheme = "https"
       tls_config {
@@ -208,21 +208,220 @@ data:
     {{- if index .Values "kube-state-metrics" "enabled" }}
     // --------------------------------------------------------------------------
     // Prometheus Scrape: kube-state-metrics
+    // Note: Subcharts use Release.Name as prefix, not fullname
     // --------------------------------------------------------------------------
     prometheus.scrape "kube_state_metrics" {
       targets = [
-        {"__address__" = "{{ include "k8s-observability-stack.fullname" . }}-kube-state-metrics:8080"},
+        {"__address__" = "{{ .Release.Name }}-kube-state-metrics:8080"},
       ]
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
       scrape_interval = "30s"
-      
+
       // Add job label
       params = {
         "job" = ["kube-state-metrics"],
       }
     }
     {{- end }}
+
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: Kubernetes API Server
+    // --------------------------------------------------------------------------
+    prometheus.scrape "apiserver" {
+      targets = [
+        {"__address__" = "kubernetes.default.svc:443"},
+      ]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
+
+      scheme = "https"
+      metrics_path = "/metrics"
+      tls_config {
+        ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+        insecure_skip_verify = true
+      }
+      authorization {
+        type             = "Bearer"
+        credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: CoreDNS
+    // --------------------------------------------------------------------------
+    discovery.relabel "coredns" {
+      targets = discovery.kubernetes.pods.targets
+
+      // Keep only CoreDNS pods
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_k8s_app"]
+        regex         = "kube-dns"
+        action        = "keep"
+      }
+
+      // Set the metrics port (pod IP:9153)
+      rule {
+        source_labels = ["__meta_kubernetes_pod_ip"]
+        regex         = "(.+)"
+        target_label  = "__address__"
+        replacement   = "$1:9153"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+      }
+    }
+
+    prometheus.scrape "coredns" {
+      targets    = discovery.relabel.coredns.output
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
+
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Node Exporter: Host-level metrics via Alloy's built-in unix exporter
+    // Provides node_* metrics compatible with Node Exporter dashboards
+    // --------------------------------------------------------------------------
+    prometheus.exporter.unix "node" {
+      // Enable common collectors for node metrics
+      enable_collectors = [
+        "cpu",
+        "diskstats",
+        "filesystem",
+        "loadavg",
+        "meminfo",
+        "netdev",
+        "uname",
+        "vmstat",
+      ]
+      // Disable collectors that require special permissions or aren't needed
+      disable_collectors = [
+        "arp",
+        "bcache",
+        "bonding",
+        "btrfs",
+        "conntrack",
+        "dmi",
+        "drbd",
+        "edac",
+        "entropy",
+        "fibrechannel",
+        "hwmon",
+        "infiniband",
+        "ipvs",
+        "mdadm",
+        "netclass",
+        "netstat",
+        "nfs",
+        "nfsd",
+        "nvme",
+        "os",
+        "powersupplyclass",
+        "pressure",
+        "rapl",
+        "schedstat",
+        "selinux",
+        "sockstat",
+        "softirqs",
+        "stat",
+        "tapestats",
+        "textfile",
+        "thermal_zone",
+        "time",
+        "timex",
+        "udp_queues",
+        "xfs",
+        "zfs",
+      ]
+    }
+
+    prometheus.scrape "node_exporter" {
+      targets    = prometheus.exporter.unix.node.targets
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
+
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Relabel: Fix job names for dashboard compatibility
+    // Alloy uses component names as job labels (e.g., prometheus.scrape.apiserver)
+    // Dashboards expect simple names (e.g., apiserver, coredns)
+    // --------------------------------------------------------------------------
+    prometheus.relabel "fix_job_labels" {
+      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.apiserver"
+        target_label  = "job"
+        replacement   = "apiserver"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.coredns"
+        target_label  = "job"
+        replacement   = "coredns"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.kubelet"
+        target_label  = "job"
+        replacement   = "kubelet"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.cadvisor"
+        target_label  = "job"
+        replacement   = "cadvisor"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.kube_state_metrics"
+        target_label  = "job"
+        replacement   = "kube-state-metrics"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.node_exporter"
+        target_label  = "job"
+        replacement   = "node-exporter"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.pods"
+        target_label  = "job"
+        replacement   = "kubernetes-pods"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.victoriametrics"
+        target_label  = "job"
+        replacement   = "victoriametrics"
+      }
+
+      rule {
+        source_labels = ["job"]
+        regex         = "prometheus\\.scrape\\.alloy_self"
+        target_label  = "job"
+        replacement   = "alloy"
+      }
+    }
 
     // --------------------------------------------------------------------------
     // Remote Write: VictoriaMetrics
@@ -237,9 +436,6 @@ data:
           max_shards           = 50
           max_samples_per_send = 2000
         }
-
-        // Retry configuration
-        retry_on_http_429 = true
       }
 
       // External labels
@@ -325,16 +521,17 @@ data:
     }
 
     // Export traces to backend
+    // Note: Subcharts use Release.Name as prefix, not fullname
     otelcol.exporter.otlp "traces" {
       client {
         {{- if .Values.victoriatraces.enabled }}
         {{- if eq .Values.victoriatraces.mode "cluster" }}
-        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-vtcluster:4317"
+        endpoint = "{{ .Release.Name }}-vtcluster:4317"
         {{- else }}
-        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-vtsingle-server:4317"
+        endpoint = "{{ .Release.Name }}-vtsingle-server:4317"
         {{- end }}
         {{- else if .Values.jaeger.enabled }}
-        endpoint = "{{ include "k8s-observability-stack.fullname" . }}-jaeger-collector:4317"
+        endpoint = "{{ .Release.Name }}-jaeger-collector:4317"
         {{- end }}
 
         tls {
@@ -351,8 +548,22 @@ data:
 
     prometheus.scrape "alloy_self" {
       targets    = prometheus.exporter.self.alloy.targets
-      forward_to = [prometheus.remote_write.victoriametrics.receiver]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
 
+      scrape_interval = "30s"
+    }
+
+    // --------------------------------------------------------------------------
+    // Prometheus Scrape: VictoriaMetrics Self-Monitoring
+    // Replaces VMSingle's built-in self-scrape (disabled via scrape.enabled=false)
+    // --------------------------------------------------------------------------
+    prometheus.scrape "victoriametrics" {
+      targets = [
+        {"__address__" = "{{ .Release.Name }}-vmsingle-server:8428"},
+      ]
+      forward_to = [prometheus.relabel.fix_job_labels.receiver]
+
+      metrics_path    = "/metrics"
       scrape_interval = "30s"
     }
 {{- end }}

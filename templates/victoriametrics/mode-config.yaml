@@ -59,10 +59,11 @@ data:
   VT_URL: {{ include "k8s-observability-stack.vtUrl" . | quote }}
   
   # OTLP endpoint for traces
+  # Note: Subcharts use Release.Name as prefix, not fullname
   {{- if eq .Values.victoriatraces.mode "cluster" }}
-  VT_OTLP_ENDPOINT: "http://{{ include "k8s-observability-stack.fullname" . }}-vtcluster:4317"
+  VT_OTLP_ENDPOINT: "http://{{ .Release.Name }}-vtcluster:4317"
   {{- else }}
-  VT_OTLP_ENDPOINT: "http://{{ include "k8s-observability-stack.fullname" . }}-vtsingle-server:4317"
+  VT_OTLP_ENDPOINT: "http://{{ .Release.Name }}-vtsingle-server:4317"
   {{- end }}
 {{- end }}
 

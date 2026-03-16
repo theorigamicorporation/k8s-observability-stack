@@ -1,0 +1,615 @@
+{{- if and (index .Values "grafana-operator" "enabled") .Values.grafana.instance.enabled .Values.grafana.dashboards.enabled .Values.mixins.enabled }}
+{{/*
+GrafanaDashboard CRs generated from mixins
+These reference ConfigMaps created by the same script
+DO NOT EDIT - regenerate with: make sync-mixins
+*/}}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-apiserver
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-apiserver
+    key: apiserver.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-cluster-total
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-cluster-total
+    key: cluster-total.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-controller-manager
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-controller-manager
+    key: controller-manager.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-cluster
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-cluster
+    key: k8s-resources-cluster.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-namespace
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-namespace
+    key: k8s-resources-namespace.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-node
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-node
+    key: k8s-resources-node.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-pod
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-pod
+    key: k8s-resources-pod.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-windows-cluster
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-windows-cluster
+    key: k8s-resources-windows-cluster.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-windows-namespace
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-windows-namespace
+    key: k8s-resources-windows-namespace.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-windows-pod
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-windows-pod
+    key: k8s-resources-windows-pod.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-workload
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-workload
+    key: k8s-resources-workload.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-workloads-namespace
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-resources-workloads-namespace
+    key: k8s-resources-workloads-namespace.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-windows-cluster-rsrc-use
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-windows-cluster-rsrc-use
+    key: k8s-windows-cluster-rsrc-use.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-windows-node-rsrc-use
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-k8s-windows-node-rsrc-use
+    key: k8s-windows-node-rsrc-use.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-kubelet
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-kubelet
+    key: kubelet.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-namespace-by-pod
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-namespace-by-pod
+    key: namespace-by-pod.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-namespace-by-workload
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-namespace-by-workload
+    key: namespace-by-workload.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-persistentvolumesusage
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-persistentvolumesusage
+    key: persistentvolumesusage.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-pod-total
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-pod-total
+    key: pod-total.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-proxy
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-proxy
+    key: proxy.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-scheduler
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-scheduler
+    key: scheduler.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-workload-total
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: kubernetes
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-workload-total
+    key: workload-total.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-loki-logs
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: loki
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-loki-logs
+    key: loki-logs.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-loki-operational
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: loki
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-loki-operational
+    key: loki-operational.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-node-cluster-rsrc-use
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: node-exporter
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-node-cluster-rsrc-use
+    key: node-cluster-rsrc-use.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-node-rsrc-use
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: node-exporter
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-node-rsrc-use
+    key: node-rsrc-use.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-nodes-aix
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: node-exporter
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-nodes-aix
+    key: nodes-aix.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-nodes-darwin
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: node-exporter
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-nodes-darwin
+    key: nodes-darwin.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-nodes
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: node-exporter
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-kubernetes
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-nodes
+    key: nodes.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-victoriametrics
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: victoriametrics
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-victoriametrics
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-victoriametrics
+    key: victoriametrics.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-vmagent
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: victoriametrics
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-victoriametrics
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-vmagent
+    key: vmagent.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-vmalert
+  namespace: {{ include "k8s-observability-stack.namespace" . }}
+  labels:
+    {{- include "k8s-observability-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboard
+    dashboard-category: victoriametrics
+spec:
+  instanceSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "k8s-observability-stack.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  folder: {{ include "k8s-observability-stack.fullname" . }}-victoriametrics
+  configMapRef:
+    name: {{ include "k8s-observability-stack.dashboardPrefix" . }}-mixin-vmalert
+    key: vmalert.json
+{{- end }}

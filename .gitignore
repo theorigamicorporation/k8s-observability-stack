@@ -22,9 +22,10 @@ Thumbs.db
 packages/
 rendered-*.yaml
 
-# Mixin vendor (regenerated via sync-mixins.sh)
+# Mixin vendor and generated files (regenerated via sync-mixins.sh)
 mixins/vendor/
 mixins/jsonnetfile.lock.json
+mixins/*.jsonnet
 
 # Temporary files
 *.tmp
