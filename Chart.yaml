@@ -103,7 +103,7 @@ dependencies:
   # VictoriaTraces Cluster - Distributed tracing backend (cluster mode)
   # https://artifacthub.io/packages/helm/victoriametrics/victoria-traces-cluster
   - name: victoria-traces-cluster
-    version: "0.0.6"
+    version: "0.2.10"
     repository: https://victoriametrics.github.io/helm-charts
     condition: victoriatraces.cluster.enabled
     alias: vtcluster
