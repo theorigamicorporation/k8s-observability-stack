@@ -95,7 +95,7 @@ dependencies:
   # VictoriaTraces Single - Distributed tracing backend (single mode)
   # https://artifacthub.io/packages/helm/victoriametrics/victoria-traces-single
   - name: victoria-traces-single
-    version: "0.0.6"
+    version: "0.1.11"
     repository: https://victoriametrics.github.io/helm-charts
     condition: victoriatraces.single.enabled
     alias: vtsingle
