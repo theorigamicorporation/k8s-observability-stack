@@ -43,7 +43,7 @@ dependencies:
   # Grafana Operator - Manages Grafana instances, datasources, and dashboards via CRDs
   # https://artifacthub.io/packages/helm/grafana/grafana-operator
   - name: grafana-operator
-    version: "5.21.4"
+    version: "5.25.0"
     repository: https://grafana.github.io/helm-charts
     condition: grafana-operator.enabled
   
