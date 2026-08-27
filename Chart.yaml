@@ -57,7 +57,7 @@ dependencies:
   # Alloy - OpenTelemetry collector for metrics, logs, and traces
   # https://artifacthub.io/packages/helm/grafana/alloy
   - name: alloy
-    version: "1.6.0"
+    version: "1.12.1"
     repository: https://grafana.github.io/helm-charts
     condition: alloy.enabled
 
