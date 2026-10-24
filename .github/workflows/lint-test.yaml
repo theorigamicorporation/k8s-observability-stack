@@ -31,7 +31,7 @@ concurrency:
 jobs:
   lint:
     name: Lint Chart
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
 
   template-render:
     name: Template Render Tests
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     needs: lint
     strategy:
       fail-fast: false
@@ -107,8 +107,14 @@ jobs:
             --debug \
             > rendered-${{ matrix.values }}.yaml
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Validate YAML syntax
         run: |
+          python3 -m pip install --quiet pyyaml
           python3 -c "import yaml; yaml.safe_load_all(open('rendered-${{ matrix.values }}.yaml'))"
 
       - name: Upload rendered templates
@@ -120,7 +126,7 @@ jobs:
 
   install-test:
     name: Install Test
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     needs: [lint, template-render]
     strategy:
       fail-fast: false
@@ -187,7 +193,7 @@ jobs:
 
   kubeconform:
     name: Kubernetes Manifest Validation
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     needs: lint
     steps:
       - name: Checkout
@@ -201,7 +207,7 @@ jobs:
       - name: Install kubeconform
         run: |
           curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | \
-            tar xz -C /usr/local/bin
+            sudo tar xz -C /usr/local/bin
 
       - name: Add Helm repositories
         run: |
@@ -223,7 +229,7 @@ jobs:
 
   security-scan:
     name: Security Scan
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     needs: lint
     steps:
       - name: Checkout
@@ -248,7 +254,7 @@ jobs:
         run: helm dependency update
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: 'config'
           scan-ref: '.'

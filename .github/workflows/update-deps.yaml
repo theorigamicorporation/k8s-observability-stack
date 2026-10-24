@@ -29,7 +29,7 @@ permissions:
 jobs:
   check-updates:
     name: Check for Updates
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     outputs:
       has_updates: ${{ steps.check.outputs.has_updates }}
       updates_summary: ${{ steps.check.outputs.updates_summary }}
@@ -86,7 +86,7 @@ jobs:
 
   update-dependencies:
     name: Update Dependencies
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     needs: check-updates
     if: needs.check-updates.outputs.has_updates == 'true'
     steps:
@@ -195,7 +195,7 @@ jobs:
 
   test-update:
     name: Test Updated Dependencies
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     needs: update-dependencies
     steps:
       - name: Checkout PR branch
@@ -264,7 +264,7 @@ jobs:
 
   auto-merge:
     name: Auto-merge on Success
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     needs: [update-dependencies, test-update]
     if: |
       always() &&
@@ -274,6 +274,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install gh
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq gh
 
       - name: Get PR number
         id: pr
@@ -298,7 +301,7 @@ jobs:
 
   no-updates:
     name: No Updates Available
-    runs-on: ubuntu-latest
+    runs-on: o4-k8s-runner-set-o4
     needs: check-updates
     if: needs.check-updates.outputs.has_updates == 'false'
     steps:
