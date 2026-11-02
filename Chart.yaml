@@ -50,7 +50,7 @@ dependencies:
   # Loki - Log aggregation system
   # https://artifacthub.io/packages/helm/grafana/loki
   - name: loki
-    version: "6.53.0"
+    version: "6.55.0"
     repository: https://grafana.github.io/helm-charts
     condition: loki.enabled
   
