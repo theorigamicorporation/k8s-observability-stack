@@ -31,6 +31,7 @@ concurrency:
 jobs:
   lint:
     name: Lint Chart
+    timeout-minutes: 10
     runs-on: o4-k8s-runner-set-o4
     steps:
       - name: Checkout
@@ -69,6 +70,7 @@ jobs:
 
   template-render:
     name: Template Render Tests
+    timeout-minutes: 10
     runs-on: o4-k8s-runner-set-o4
     needs: lint
     strategy:
@@ -126,6 +128,7 @@ jobs:
 
   install-test:
     name: Install Test
+    timeout-minutes: 20
     runs-on: o4-k8s-runner-set-o4
     needs: [lint, template-render]
     strategy:
@@ -193,6 +196,7 @@ jobs:
 
   kubeconform:
     name: Kubernetes Manifest Validation
+    timeout-minutes: 10
     runs-on: o4-k8s-runner-set-o4
     needs: lint
     steps:
@@ -229,6 +233,7 @@ jobs:
 
   security-scan:
     name: Security Scan
+    timeout-minutes: 10
     runs-on: o4-k8s-runner-set-o4
     needs: lint
     steps:

@@ -26,9 +26,14 @@ permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   check-updates:
     name: Check for Updates
+    timeout-minutes: 30
     runs-on: o4-k8s-runner-set-o4
     outputs:
       has_updates: ${{ steps.check.outputs.has_updates }}
@@ -86,6 +91,7 @@ jobs:
 
   update-dependencies:
     name: Update Dependencies
+    timeout-minutes: 30
     runs-on: o4-k8s-runner-set-o4
     needs: check-updates
     if: needs.check-updates.outputs.has_updates == 'true'
@@ -195,6 +201,7 @@ jobs:
 
   test-update:
     name: Test Updated Dependencies
+    timeout-minutes: 30
     runs-on: o4-k8s-runner-set-o4
     needs: update-dependencies
     steps:
@@ -264,6 +271,7 @@ jobs:
 
   auto-merge:
     name: Auto-merge on Success
+    timeout-minutes: 30
     runs-on: o4-k8s-runner-set-o4
     needs: [update-dependencies, test-update]
     if: |
@@ -301,6 +309,7 @@ jobs:
 
   no-updates:
     name: No Updates Available
+    timeout-minutes: 30
     runs-on: o4-k8s-runner-set-o4
     needs: check-updates
     if: needs.check-updates.outputs.has_updates == 'false'
