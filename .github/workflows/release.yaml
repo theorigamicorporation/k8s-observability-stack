@@ -21,9 +21,14 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   release:
     name: Release Helm Chart
+    timeout-minutes: 60
     runs-on: o4-k8s-runner-set-o4
     steps:
       - name: Checkout
@@ -187,6 +192,7 @@ jobs:
 
   notify:
     name: Notify Release
+    timeout-minutes: 60
     runs-on: o4-k8s-runner-set-o4
     needs: release
     if: success()
